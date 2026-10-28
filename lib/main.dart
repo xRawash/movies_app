@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/config/theme_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
-import 'package:movies_app/prefs_manager/prefs_manager.dart';
+import 'package:movies_app/features/auth/register_screen/register_screen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await PrefsManager.init();
+void main() {
   runApp(const Movies());
 }
 
@@ -14,12 +11,11 @@ class Movies extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isFinishedOnboarding = PrefsManager.getIsFinishedOnboarding() ?? false;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: isFinishedOnboarding ? RoutesManager.login : RoutesManager.onboarding,
+      initialRoute: RoutesManager.onboarding,
       onGenerateRoute: RoutesManager.getRoute,
-      theme: ThemeManager.light,
+      home: RegisterScreen(),
     );
   }
 }
