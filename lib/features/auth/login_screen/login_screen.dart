@@ -1,4 +1,4 @@
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+
 import 'package:flutter/material.dart';
 import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
