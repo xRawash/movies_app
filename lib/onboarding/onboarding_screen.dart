@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/models/onboarding_model.dart';
@@ -103,33 +102,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               );
             },
           ),
-          // child: Container(
-          //       decoration: BoxDecoration(
-          //         color:index == 0 ? Colors.transparent : ColorsManager.black,
-          //         borderRadius: BorderRadius.only(
-          //           topLeft: Radius.circular(38),
-          //           topRight: Radius.circular(38),
-          //         ),
-          //       ),
-          //       child: Column(
-          //         mainAxisAlignment: MainAxisAlignment.center,
-          //         children: [
-          //           Text(
-          //             onboardings[index].label,
-          //             style: Theme.of(context).textTheme.labelLarge,
-          //           ),
-          //           SizedBox(height: 20),
-          //           Text(
-          //             onboardings[index].description,
-          //             style: index == 0
-          //                 ? Theme.of(context).textTheme.displayMedium
-          //                 : Theme.of(context).textTheme.bodyMedium,
-          //           ),
-          //           SizedBox(height: 24),
-          //           CustomElevatedButton(title: Text(index == 0 ? "Explore Now" : "Next", style: Theme.of(context).textTheme.titleMedium, ), onPressed: (){})
-          //         ],
-          //       ),
-          //     )
         );
       },
     );

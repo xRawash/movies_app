@@ -37,6 +37,7 @@ dependencies:
   flutter_native_splash: ^2.4.8
   shared_preferences: ^2.5.6
   flutter_launcher_icons: ^0.14.4
+  animated_toggle_switch: ^0.8.7
 
 dev_dependencies:
   flutter_test:

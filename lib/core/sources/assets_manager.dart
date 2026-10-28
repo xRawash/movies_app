@@ -6,4 +6,8 @@ class ImageAssets {
   static String onboarding4 = '${base}onboarding_image4.png';
   static String onboarding5 = '${base}onboarding_image5.png';
   static String onboarding6 = '${base}onboarding_image6.png';
+  static String logo = '${base}Movies_Logo.png';
+  static String googleLogo = '${base}googleLogo.png';
+  static String arFlag = '${base}eg.png';
+  static String enFlag = '${base}usa.png';
 }
