@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
@@ -20,8 +19,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late TextEditingController _nameController;
   late TextEditingController _phoneNumberController;
   late TextEditingController _passwordConfirmController;
+  late PageController _pageController;
   bool isArabic = false;
   bool isObscured = true;
+
+  final List<String> avatarSeeds = [
+    'Felix',
+    'Aneka',
+    'Milo',
+    'Zoe',
+    'Leo',
+    'Mia',
+    'Charlie',
+    'Oliver',
+    'Sasha',
+    'Luna'
+  ];
+  String selectedAvatarSeed = 'Felix';
 
   @override
   void initState() {
@@ -31,6 +45,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _nameController = TextEditingController();
     _phoneNumberController = TextEditingController();
     _passwordConfirmController = TextEditingController();
+    _pageController = PageController(viewportFraction: 0.35, initialPage: 0);
   }
 
   @override
@@ -40,6 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _nameController.dispose();
     _phoneNumberController.dispose();
     _passwordConfirmController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
   @override
@@ -48,13 +64,85 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(
         title: Text("Register"),
       ),
-      resizeToAvoidBottomInset: false,
-      extendBody: true,
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            SizedBox(
+              height: 90,
+              child: PageView.builder(
+                controller: _pageController,
+                physics: BouncingScrollPhysics(),
+                itemCount: avatarSeeds.length,
+                onPageChanged: (index) {
+                  setState(() {
+                    selectedAvatarSeed = avatarSeeds[index];
+                  });
+                },
+                itemBuilder: (context, index) {
+                  final seed = avatarSeeds[index];
+                  final isSelected = seed == selectedAvatarSeed;
+                  return AnimatedBuilder(
+                    animation: _pageController,
+                    builder: (context, child) {
+                      double value = 1.0;
+                      if (_pageController.position.haveDimensions) {
+                        value = _pageController.page! - index;
+                        value = (1 - (value.abs() * 0.25)).clamp(0.75, 1.0);
+                      }
+                      return Center(
+                        child: Transform.scale(
+                          scale: value,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected ? ColorsManager.yellow : Colors.transparent,
+                          width: 3,
+                        ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: ColorsManager.yellow.withValues(alpha: 0.4),
+                                  blurRadius: 8,
+                                  spreadRadius: 2,
+                                )
+                              ]
+                            : [],
+                      ),
+                      child: ClipOval(
+                        child: Image.network(
+                          'https://api.dicebear.com/7.x/avataaars/png?seed=$seed',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            Icons.person,
+                            color: ColorsManager.yellow,
+                            size: 36,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              "Swipe to choose your avatar",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(height: 16),
             CustomTextField(
               controller: _nameController,
               hint: "Name",
