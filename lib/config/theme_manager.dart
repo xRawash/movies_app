@@ -53,4 +53,5 @@ class ThemeManager {
       ),
     ),
   );
+  static final ThemeData dark = ThemeData();
 }

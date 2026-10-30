@@ -8,8 +8,20 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  List<Widget> tabs = [
+
+  ];
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+
+          ],
+        ),
+      ),
+
+    );
   }
 }

@@ -1,54 +1,42 @@
 class UserModel {
-  UserModel({
-      this.name, 
-      this.id, 
-      this.email, 
-      this.phone, 
-      this.avatar, 
-      this.wishListMoviesIds,
-      this.history,});
+  static UserModel? loggedInUser;
   String? name;
   String? id;
   String? email;
   String? phone;
-  String? avatar;
+  String? avatarName;
   List<String>? wishListMoviesIds;
-  List<String>? history;
-  UserModel.fromJson(dynamic json) {
+  List<String>? watchedMoviesIds;
+  UserModel({
+    required this.name,
+    required this.id,
+    required this.email,
+    required this.phone,
+    this.avatarName,
+    List<String>? wishListMoviesIds,
+    List<String>? watchedMoviesIds,
+  }) : watchedMoviesIds = watchedMoviesIds ?? [], wishListMoviesIds = wishListMoviesIds ?? [];
+
+
+  UserModel.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     id = json['id'];
     email = json['email'];
     phone = json['phone'];
-    avatar = json['avatar'];
-    if (json['watchList'] != null) {
-      wishListMoviesIds = [];
-      // json['watchList'].forEach((v) {
-      //   wishListMoviesIds?.add(Dynamic.fromJson(v));
-      // });
-    }
-    if (json['history'] != null) {
-      history = [];
-      // json['history'].forEach((v) {
-      //   history?.add(Dynamic.fromJson(v));
-      // });
-    }
+    avatarName = json['avatar'];
+    wishListMoviesIds = List<String>.from(json['watchList'] ?? const []);
+    watchedMoviesIds = List<String>.from(json['history'] ?? const []);
   }
-
 
   Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['name'] = name;
-    map['id'] = id;
-    map['email'] = email;
-    map['phone'] = phone;
-    map['avatar'] = avatar;
-    // if (wishListMoviesIds != null) {
-    //   map['watchList'] = wishListMoviesIds?.map((v) => v.toJson()).toList();
-    // }
-    // if (history != null) {
-    //   map['history'] = history?.map((v) => v.toJson()).toList();
-    // }
-    return map;
+    return {
+      'name': name,
+      'id': id,
+      'email': email,
+      'phone': phone,
+      'avatar': avatarName,
+      'watchList': wishListMoviesIds,
+      'history': watchedMoviesIds,
+    };
   }
-
 }

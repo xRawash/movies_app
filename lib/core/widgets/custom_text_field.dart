@@ -9,7 +9,8 @@ class CustomTextField extends StatefulWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.obscureText = false,
-    this.validation
+    this.validation,
+    this.textInputType
   });
 
   final TextEditingController controller;
@@ -18,6 +19,7 @@ class CustomTextField extends StatefulWidget {
   final Widget? prefixIcon;
   final bool obscureText;
   final String? Function(String?)? validation;
+  final TextInputType? textInputType;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -50,6 +52,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       style: TextStyle(fontSize: 16, color: Colors.white),
       validator: widget.validation,
       autovalidateMode: AutovalidateMode.always,
+      keyboardType: widget.textInputType,
       decoration: InputDecoration(
         suffixIcon: widget.obscureText ? obscureIcon() : widget.suffixIcon,
         prefixIcon: widget.prefixIcon,
