@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/api/api_services.dart';
 import 'package:movies_app/api/movie_response/Movies.dart';
+import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
+import 'package:movies_app/features/main_layout/movie_item/movie_item.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});
@@ -13,6 +15,7 @@ class SearchTab extends StatefulWidget {
 class _SearchTabState extends State<SearchTab> {
   late TextEditingController _searchController;
   List<Movies> searchResults = [];
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -22,10 +25,37 @@ class _SearchTabState extends State<SearchTab> {
 
   @override
   void dispose() {
-    super.dispose();
     _searchController.dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 
+  Future<void> _searchMovies(String query) async {
+    if (query.trim().isEmpty) {
+      setState(() {
+        searchResults = [];
+        isLoading = false;
+      });
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await ApiServices.searchMovies(query.trim());
+      setState(() {
+        searchResults = response.data?.movies ?? [];
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        searchResults = [];
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,26 +66,47 @@ class _SearchTabState extends State<SearchTab> {
           children: [
             CustomTextField(
               controller: _searchController,
-              hint: 'Search',
+              hint: 'Search movies...',
               prefixIcon: Icon(Icons.search),
+              onChanged: (value) {
+                _searchMovies(value ?? '');
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            Expanded(
+              child: isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: ColorsManager.yellow,
+                      ),
+                    )
+                  : searchResults.isEmpty
+                      ? Center(
+                          child: Text(
+                            _searchController.text.isEmpty
+                                ? "Search for your favorite movies"
+                                : "No movies found",
+                            style: TextStyle(color: Colors.white70, fontSize: 16),
+                          ),
+                        )
+                      : GridView.builder(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.65,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                          ),
+                          itemCount: searchResults.length,
+                          itemBuilder: (context, index) {
+                            return MovieItem(movie: searchResults[index]);
+                          },
+                        ),
             ),
           ],
         ),
       ),
+      
     );
-  }
-
-  Future<void> _searchMovies() async {
-    if (_searchController.text.isEmpty) {
-      setState(() {
-        searchResults = [];
-      });
-      return;
-    }
-    ApiServices.searchMovies(_searchController.text).then((value) {
-      setState(() {
-        searchResults = value.data!.movies!;
-      });
-    });
   }
 }
