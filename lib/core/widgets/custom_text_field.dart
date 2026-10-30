@@ -10,7 +10,8 @@ class CustomTextField extends StatefulWidget {
     this.suffixIcon,
     this.obscureText = false,
     this.validation,
-    this.textInputType
+    this.textInputType,
+    this.onChanged
   });
 
   final TextEditingController controller;
@@ -20,6 +21,7 @@ class CustomTextField extends StatefulWidget {
   final bool obscureText;
   final String? Function(String?)? validation;
   final TextInputType? textInputType;
+  final String? Function(String?)? onChanged;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -46,6 +48,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      onChanged: widget.onChanged,
       controller: widget.controller,
       obscureText: widget.obscureText,
       obscuringCharacter: '*',

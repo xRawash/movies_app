@@ -10,6 +10,14 @@ class ThemeManager {
         centerTitle: true,
         titleTextStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: ColorsManager.yellow)
     ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: ColorsManager.darkGrey,
+      selectedItemColor: ColorsManager.yellow,
+      unselectedItemColor: Colors.white,
+      type: BottomNavigationBarType.fixed,
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+    ),
     textTheme: TextTheme(
       labelLarge: TextStyle(
         fontSize: 36,

@@ -1,0 +1,27 @@
+class GenresIds {
+  static List<String> genres = [
+    "action",
+    "adventure",
+    "animation",
+    "biography",
+    "comedy",
+    "crime",
+    "documentary",
+    "drama",
+    "family",
+    "fantasy",
+    "film - noir",
+    "history",
+    "horror",
+    "music",
+    "musical",
+    "mystery",
+    "romance",
+    "sci - fi",
+    "short",
+    "sport",
+    "thriller",
+    "war",
+    "western"
+  ];
+}
