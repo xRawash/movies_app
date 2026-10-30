@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
+import 'package:movies_app/core/validations/validations.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/core/widgets/custom_text_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
@@ -48,12 +49,14 @@ class _LoginScreenState extends State<LoginScreen> {
             Center(child: Image(image: AssetImage(ImageAssets.logo))),
             CustomTextField(
               controller: _emailController,
+              validation: Validations.validateEmail,
               hint: "Email",
               prefixIcon: Icon(Icons.email),
             ),
             SizedBox(height: 23),
             CustomTextField(
               controller: _passwordController,
+              validation: Validations.validatePassword,
               obscureText: isObscured,
               hint: "Password",
               prefixIcon: Icon(Icons.lock),

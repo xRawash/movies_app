@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_app/config/theme_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
@@ -5,6 +6,7 @@ import 'package:movies_app/prefs_manager/prefs_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await PrefsManager.init();
   runApp(const Movies());
 }

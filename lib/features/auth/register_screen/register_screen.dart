@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
+import 'package:movies_app/core/validations/validations.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/core/widgets/custom_text_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
@@ -145,18 +146,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SizedBox(height: 16),
             CustomTextField(
               controller: _nameController,
+              validation: Validations.validateName,
               hint: "Name",
               prefixIcon: Icon(Icons.perm_identity_outlined),
             ),
             SizedBox(height: 23),
             CustomTextField(
               controller: _emailController,
+
+              validation: Validations.validateEmail,
               hint: "Email",
               prefixIcon: Icon(Icons.email),
             ),
             SizedBox(height: 23),
             CustomTextField(
               controller: _passwordController,
+              validation: Validations.validatePassword,
               obscureText: isObscured,
               hint: "Password",
               prefixIcon: Icon(Icons.lock),
@@ -174,6 +179,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SizedBox(height: 16),
             CustomTextField(
               controller: _passwordConfirmController,
+              validation: (value) => Validations.validatePasswordConfirmation(value, _passwordController.text),
               obscureText: isObscured,
               hint: "Confirm Password",
               prefixIcon: Icon(Icons.lock),
@@ -191,6 +197,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SizedBox(height: 16),
             CustomTextField(
               controller: _phoneNumberController,
+              validation: Validations.validatePhone,
               hint: "Phone Number",
               prefixIcon: Icon(Icons.phone),
             ),

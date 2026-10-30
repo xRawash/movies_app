@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
+import 'package:movies_app/core/validations/validations.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
 
@@ -37,7 +38,12 @@ class _ForgetPasswordState extends State<ForgetPassword> {
           children: [
             Image(image: AssetImage(ImageAssets.forgerPassword)),
             SizedBox(height: 24),
-            CustomTextField(controller: _emailController, hint: "Email", prefixIcon: Icon(Icons.email),),
+            CustomTextField(
+              controller: _emailController,
+              validation: Validations.validateEmail,
+              hint: "Email",
+              prefixIcon: Icon(Icons.email),
+            ),
             SizedBox(height: 24),
             CustomElevatedButton(
               title: Text(
