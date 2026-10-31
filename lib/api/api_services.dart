@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:movies_app/api/movie_detailed_response/Movie_detailed_response.dart';
+import 'package:movies_app/api/movie_response/Movies.dart';
 import 'package:movies_app/api/movie_response/Movies_response.dart';
 
 class ApiServices {
@@ -51,5 +52,12 @@ class ApiServices {
     Map<String, dynamic> json = jsonDecode(serverResponse.body);
     MoviesResponse moviesResponse = MoviesResponse.fromJson(json);
     return moviesResponse;
+  }
+  static Future<Movies> getMovieById(String movieId) async {
+    Uri url = Uri.https(_authority, _moviesEndPoint, {'movie_id': movieId});
+    http.Response serverResponse = await http.get(url);
+    Map<String, dynamic> json = jsonDecode(serverResponse.body);
+    Movies movies = Movies.fromJson(json);
+    return movies;
   }
 }

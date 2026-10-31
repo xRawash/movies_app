@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:movies_app/api/movie_response/Movies.dart';
 import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
+import 'package:movies_app/features/main_layout/movie_item/movie_item.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/models/user_model.dart';
 
@@ -16,23 +18,27 @@ class ProfileTab extends StatefulWidget {
 class _ProfileTabState extends State<ProfileTab> {
   UserModel currentUser = UserModel.loggedInUser!;
   late String avatarSeed;
-  late List<String> wishListMoviesIds;
+  int selectedTab = 0;
 
   @override
   void initState() {
     super.initState();
-    wishListMoviesIds = currentUser.wishListMoviesIds ?? [];
     avatarSeed = currentUser.avatarName ?? " ";
   }
 
   @override
   Widget build(BuildContext context) {
+    currentUser = UserModel.loggedInUser!;
+    List<Map<String, dynamic>> movies = selectedTab == 0
+        ? (currentUser.wishListMoviesIds ?? [])
+        : (currentUser.watchedMoviesIds ?? []);
+
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.only(top: 50, left: 16, right: 16),
+              padding: EdgeInsets.only(top: 50, left: 16, right: 16, bottom: 16),
               color: ColorsManager.darkGrey,
               child: Column(
                 children: [
@@ -64,7 +70,7 @@ class _ProfileTabState extends State<ProfileTab> {
                         child: Column(
                           children: [
                             Text(
-                              currentUser.wishListMoviesIds!.length.toString(),
+                              (currentUser.wishListMoviesIds ?? []).length.toString(),
                               style: Theme.of(context).textTheme.labelLarge!
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),
@@ -79,7 +85,7 @@ class _ProfileTabState extends State<ProfileTab> {
                         child: Column(
                           children: [
                             Text(
-                              currentUser.watchedMoviesIds!.length.toString(),
+                              (currentUser.watchedMoviesIds ?? []).length.toString(),
                               style: Theme.of(context).textTheme.labelLarge!
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),
@@ -104,7 +110,10 @@ class _ProfileTabState extends State<ProfileTab> {
                                 .copyWith(fontWeight: FontWeight.normal),
                           ),
                           onPressed: () async {
-                            await Navigator.pushNamed(context, RoutesManager.updateProfile);
+                            await Navigator.pushNamed(
+                              context,
+                              RoutesManager.updateProfile,
+                            );
                             setState(() {
                               currentUser = UserModel.loggedInUser!;
                               avatarSeed = currentUser.avatarName ?? " ";
@@ -135,29 +144,71 @@ class _ProfileTabState extends State<ProfileTab> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10,),
+                  SizedBox(height: 10),
                   DefaultTabController(
-                    initialIndex: 0,
+                    initialIndex: selectedTab,
                     length: 2,
                     child: TabBar(
+                      onTap: (index) {
+                        setState(() {
+                          selectedTab = index;
+                        });
+                      },
                       indicatorSize: TabBarIndicatorSize.tab,
-                      unselectedLabelStyle: Theme.of(context).textTheme.bodyMedium,
+                      unselectedLabelStyle: Theme.of(context)
+                          .textTheme
+                          .bodyMedium,
                       labelStyle: Theme.of(context).textTheme.bodyMedium,
                       indicatorColor: ColorsManager.yellow,
                       tabs: [
-                        Tab(text: "Wish List", icon: Icon(Icons.list, color: ColorsManager.yellow,)),
-                        Tab(text: "History", icon: Icon(Icons.folder, color: ColorsManager.yellow,)),
+                        Tab(
+                          text: "Wish List",
+                          icon: Icon(Icons.list, color: ColorsManager.yellow),
+                        ),
+                        Tab(
+                          text: "History",
+                          icon: Icon(Icons.folder, color: ColorsManager.yellow),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            Column(
-              children: [
-                Image.asset(ImageAssets.empty)
-              ],
-            )
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  movies.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 40.0),
+                          child: Image.asset(ImageAssets.empty),
+                        )
+                      : GridView.builder(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.7,
+                          ),
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: movies.length,
+                          itemBuilder: (context, index) {
+                            Movies movie = Movies.fromJson(movies[index]);
+                            return MovieItem(
+                              movie: movie,
+                              onNavigateBack: () {
+                                setState(() {
+                                  currentUser = UserModel.loggedInUser!;
+                                });
+                              },
+                            );
+                          },
+                        ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

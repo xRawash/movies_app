@@ -5,16 +5,16 @@ class UserModel {
   String? email;
   String? phone;
   String? avatarName;
-  List<String>? wishListMoviesIds;
-  List<String>? watchedMoviesIds;
+  List<Map<String, dynamic>>? wishListMoviesIds;
+  List<Map<String, dynamic>>? watchedMoviesIds;
   UserModel({
     required this.name,
     required this.id,
     required this.email,
     required this.phone,
     this.avatarName,
-    List<String>? wishListMoviesIds,
-    List<String>? watchedMoviesIds,
+    List<Map<String, dynamic>>? wishListMoviesIds,
+    List<Map<String, dynamic>>? watchedMoviesIds,
   }) : watchedMoviesIds = watchedMoviesIds ?? [], wishListMoviesIds = wishListMoviesIds ?? [];
 
 
@@ -24,8 +24,8 @@ class UserModel {
     email = json['email'];
     phone = json['phone'];
     avatarName = json['avatar'];
-    wishListMoviesIds = List<String>.from(json['watchList'] ?? const []);
-    watchedMoviesIds = List<String>.from(json['history'] ?? const []);
+    wishListMoviesIds = List<Map<String, dynamic>>.from(json['watchList'] ?? const []);
+    watchedMoviesIds = List<Map<String, dynamic>>.from(json['history'] ?? const []);
   }
 
   Map<String, dynamic> toJson() {

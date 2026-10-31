@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:movies_app/api/movie_detailed_response/Movie.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/models/user_model.dart';
 
@@ -312,22 +313,27 @@ class FirebaseServices {
     userDocument.update(UserModel.loggedInUser!.toJson());
     Navigator.pop(context);
   }
-  static Future<void> addMovieToWishList(String movieId) async {
+  static Future<void> addMovieToWishList(Movie movie) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
     _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    UserModel.loggedInUser!.wishListMoviesIds!.add(movieId);
-    userDocument.update(UserModel.loggedInUser!.toJson());
+    bool exists = UserModel.loggedInUser!.wishListMoviesIds!
+        .any((item) => item['id'] == movie.id);
+    if (!exists) {
+      UserModel.loggedInUser!.wishListMoviesIds!.add(movie.toJson());
+      userDocument.update(UserModel.loggedInUser!.toJson());
+    }
   }
-  static Future<void> removeMovieFromWishList(String movieId) async {
+  static Future<void> removeMovieFromWishList(Movie movie) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
     _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    UserModel.loggedInUser!.wishListMoviesIds!.remove(movieId);
+    UserModel.loggedInUser!.wishListMoviesIds!
+        .removeWhere((item) => item['id'] == movie.id);
     userDocument.update(UserModel.loggedInUser!.toJson());
   }
 }

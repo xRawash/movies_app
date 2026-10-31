@@ -7,13 +7,14 @@ import 'package:movies_app/api/movie_response/Movies_response.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 
 class MovieItem extends StatelessWidget {
-  const MovieItem({super.key, required this.movie});
+  const MovieItem({super.key, required this.movie, this.onNavigateBack});
   final Movies movie;
+  final VoidCallback? onNavigateBack;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: ()  {
+      onTap: () {
         _goToMovieDetails(context);
       },
       child: AspectRatio(
@@ -79,13 +80,17 @@ class MovieItem extends StatelessWidget {
       ),
     );
   }
+
   Future<void> _goToMovieDetails(BuildContext context) async {
     MoviesResponse moviesResponse = await ApiServices.getMovieSuggestions(movie.id.toString());
     List<Movies> similarMovies = moviesResponse.data?.movies ?? [];
     MovieDetailedResponse movieResponse = await ApiServices.getMovieDetails(movie.id.toString());
     Movie? movieDetailed = movieResponse.data!.movie;
     movieDetailed?.similarMovies = similarMovies;
-    if(!context.mounted) return;
-    Navigator.pushNamed(context, '/movieDetails', arguments: movieDetailed);
+    if (!context.mounted) return;
+    await Navigator.pushNamed(context, '/movieDetails', arguments: movieDetailed);
+    if (onNavigateBack != null) {
+      onNavigateBack!();
+    }
   }
 }

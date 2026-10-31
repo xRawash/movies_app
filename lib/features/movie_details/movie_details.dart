@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/api/api_services.dart';
 import 'package:movies_app/api/movie_detailed_response/Movie.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
@@ -16,10 +15,12 @@ class MovieDetails extends StatefulWidget {
 }
 
 class _MovieDetailsState extends State<MovieDetails> {
-  bool isBookMarked = false;
   @override
   Widget build(BuildContext context) {
     Movie movie = ModalRoute.of(context)!.settings.arguments as Movie;
+    bool isBookMarked = UserModel.loggedInUser?.wishListMoviesIds
+            ?.any((item) => item['id'] == movie.id) ??
+        false;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -34,18 +35,18 @@ class _MovieDetailsState extends State<MovieDetails> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
+            onPressed: () async {
               setState(() {
                 if (isBookMarked) {
-                  FirebaseServices.removeMovieFromWishList(movie.id.toString());
-                  isBookMarked = false;
+                  FirebaseServices.removeMovieFromWishList(movie);
                 } else {
-                  FirebaseServices.addMovieToWishList(movie.id.toString());
-                  isBookMarked = true;
+                  FirebaseServices.addMovieToWishList(movie);
                 }
               });
             },
-            icon: Icon(isBookMarked ? Icons.bookmark : Icons.bookmark_outline_sharp ),
+            icon: Icon(
+              isBookMarked ? Icons.bookmark : Icons.bookmark_outline_sharp,
+            ),
             color: Colors.white,
           ),
         ],
