@@ -211,4 +211,23 @@ class FirebaseServices {
       return null;
     }
   }
+
+  static Future<void> signOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      await GoogleSignIn.instance.signOut();
+      if(!context.mounted) return;
+      Navigator.pushReplacementNamed(context, RoutesManager.login);
+  } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'network-request-failed':
+          Utilities.showToast('Network error. Check your connection.');
+          break;
+        default:
+          Utilities.showToast('Sign-out failed. Please try again.');
+      }
+    } catch (e) {
+      Utilities.showToast('Sign-out failed. Please try again.');
+    }
+  }
 }

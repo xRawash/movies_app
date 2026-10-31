@@ -36,7 +36,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Image(image: AssetImage(ImageAssets.forgerPassword)),
+            Image(image: AssetImage(ImageAssets.forgetPassword)),
             SizedBox(height: 24),
             CustomTextField(
               controller: _emailController,

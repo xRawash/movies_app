@@ -10,9 +10,8 @@ class ImageAssets {
   static String googleLogo = '${base}googleLogo.png';
   static String arFlag = '${base}eg.png';
   static String enFlag = '${base}usa.png';
-  static String forgerPassword = '${base}Forgot password-bro 1.png';
-  static String movieCover = '${base}medium-cover.jpg';
+  static String forgetPassword = '${base}Forgot password-bro 1.png';
   static String availableNow = '${base}Available Now.png';
   static String watchNow = '${base}Watch Now.png';
-  static String smallCover = '${base}small-cover.jpg';
+  static String empty = '${base}Empty.png';
 }
