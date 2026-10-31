@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movies_app/api/avatar_seeds/avatar_seeds.dart';
 import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
@@ -28,19 +29,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool isObscured = true;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final List<String> avatarSeeds = [
-    'Felix',
-    'Aneka',
-    'Milo',
-    'Zoe',
-    'Leo',
-    'Mia',
-    'Charlie',
-    'Oliver',
-    'Sasha',
-    'Luna',
-  ];
-  String selectedAvatarSeed = 'Felix';
+  final List<String> avatarSeeds = AvatarSeeds.avatars;
+  late String selectedAvatarSeed;
 
   @override
   void initState() {
@@ -51,6 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _phoneNumberController = TextEditingController();
     _passwordConfirmController = TextEditingController();
     _pageController = PageController(viewportFraction: 0.35, initialPage: 0);
+    selectedAvatarSeed = avatarSeeds[0];
   }
 
   @override

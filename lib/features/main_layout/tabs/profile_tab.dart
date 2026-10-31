@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
+import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/models/user_model.dart';
@@ -102,7 +103,13 @@ class _ProfileTabState extends State<ProfileTab> {
                             style: Theme.of(context).textTheme.titleMedium!
                                 .copyWith(fontWeight: FontWeight.normal),
                           ),
-                          onPressed: () {},
+                          onPressed: () async {
+                            await Navigator.pushNamed(context, RoutesManager.updateProfile);
+                            setState(() {
+                              currentUser = UserModel.loggedInUser!;
+                              avatarSeed = currentUser.avatarName ?? " ";
+                            });
+                          },
                           backgroundColor: ColorsManager.yellow,
                         ),
                       ),

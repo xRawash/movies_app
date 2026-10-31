@@ -59,7 +59,8 @@ class ThemeManager {
         fontWeight: FontWeight.normal,
         color: ColorsManager.yellow,
       ),
-      headlineLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)
+      headlineLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+      titleLarge: TextStyle(fontWeight: FontWeight.normal, fontSize: 20 , color: ColorsManager.black)
     ),
   );
   static final ThemeData dark = ThemeData();
