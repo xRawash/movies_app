@@ -312,4 +312,22 @@ class FirebaseServices {
     userDocument.update(UserModel.loggedInUser!.toJson());
     Navigator.pop(context);
   }
+  static Future<void> addMovieToWishList(String movieId) async {
+    CollectionReference<Map<String, dynamic>> usersCollection =
+    _getUsersCollectionReference();
+    DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
+      UserModel.loggedInUser!.id,
+    );
+    UserModel.loggedInUser!.wishListMoviesIds!.add(movieId);
+    userDocument.update(UserModel.loggedInUser!.toJson());
+  }
+  static Future<void> removeMovieFromWishList(String movieId) async {
+    CollectionReference<Map<String, dynamic>> usersCollection =
+    _getUsersCollectionReference();
+    DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
+      UserModel.loggedInUser!.id,
+    );
+    UserModel.loggedInUser!.wishListMoviesIds!.remove(movieId);
+    userDocument.update(UserModel.loggedInUser!.toJson());
+  }
 }
