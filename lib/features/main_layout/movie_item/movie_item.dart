@@ -93,4 +93,5 @@ class MovieItem extends StatelessWidget {
       onNavigateBack!();
     }
   }
+
 }

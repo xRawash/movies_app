@@ -4,6 +4,7 @@ import 'package:movies_app/features/auth/login_screen/login_screen.dart';
 import 'package:movies_app/features/auth/register_screen/register_screen.dart';
 import 'package:movies_app/features/main_layout/main_screen.dart';
 import 'package:movies_app/features/movie_details/movie_details.dart';
+import 'package:movies_app/features/torrent_player_screen/torrent_player_screen.dart';
 import 'package:movies_app/features/update_profile/update_profile.dart';
 import 'package:movies_app/onboarding/onboarding_screen.dart';
 
@@ -15,6 +16,7 @@ class RoutesManager {
   static const String mainScreen = '/mainScreen';
   static const String updateProfile = '/updateProfile';
   static const String movieDetails = '/movieDetails';
+  static const String torrentPlayer = '/torrentPlayer';
 
   static Route? getRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -47,6 +49,16 @@ class RoutesManager {
           return MaterialPageRoute(
             builder: (context) => MovieDetails(),
             settings: settings,
+          );
+        }
+      case torrentPlayer:
+        {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => TorrentPlayerScreen(
+              magnetLink: args?['magnetLink'] ?? '',
+              torrentId: args?['torrentId'] ?? '',
+            ),
           );
         }
       default:

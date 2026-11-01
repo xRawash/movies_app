@@ -4,6 +4,7 @@ import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/features/main_layout/movie_item/movie_item.dart';
 import 'package:movies_app/features/main_layout/widgets/custom_card.dart';
+import 'package:movies_app/features/movie_details/widgets/resolution_dialog.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/models/user_model.dart';
 
@@ -18,8 +19,10 @@ class _MovieDetailsState extends State<MovieDetails> {
   @override
   Widget build(BuildContext context) {
     Movie movie = ModalRoute.of(context)!.settings.arguments as Movie;
-    bool isBookMarked = UserModel.loggedInUser?.wishListMoviesIds
-            ?.any((item) => item['id'] == movie.id) ??
+    bool isBookMarked =
+        UserModel.loggedInUser?.wishListMoviesIds?.any(
+          (item) => item['id'] == movie.id,
+        ) ??
         false;
 
     return Scaffold(
@@ -64,7 +67,9 @@ class _MovieDetailsState extends State<MovieDetails> {
                 Column(
                   children: [
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showResolutionDialog(context, movie);
+                      },
                       icon: Icon(Icons.play_circle_filled_sharp),
                       color: ColorsManager.yellow,
                       iconSize: 100,
@@ -92,7 +97,9 @@ class _MovieDetailsState extends State<MovieDetails> {
                       "Watch",
                       style: Theme.of(context).textTheme.headlineLarge,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      showResolutionDialog(context, movie);
+                    },
                     backgroundColor: ColorsManager.red,
                   ),
                   Row(
@@ -110,7 +117,10 @@ class _MovieDetailsState extends State<MovieDetails> {
                                   movie.likeCount.toString(),
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.displaySmall?.copyWith(fontSize: 14),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displaySmall
+                                      ?.copyWith(fontSize: 14),
                                 ),
                               ),
                             ],
@@ -133,7 +143,10 @@ class _MovieDetailsState extends State<MovieDetails> {
                                   movie.runtime.toString(),
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.displaySmall?.copyWith(fontSize: 14),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displaySmall
+                                      ?.copyWith(fontSize: 14),
                                 ),
                               ),
                             ],
@@ -153,7 +166,10 @@ class _MovieDetailsState extends State<MovieDetails> {
                                   movie.rating.toString(),
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.displaySmall?.copyWith(fontSize: 14),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displaySmall
+                                      ?.copyWith(fontSize: 14),
                                 ),
                               ),
                             ],
@@ -227,7 +243,10 @@ class _MovieDetailsState extends State<MovieDetails> {
                                 width: 60,
                                 height: 60,
                                 color: ColorsManager.darkGrey,
-                                child: Icon(Icons.person, color: Colors.white),
+                                child: Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
