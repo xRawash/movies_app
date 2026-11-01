@@ -4,6 +4,7 @@ import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/validations/validations.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
+import 'package:movies_app/firebase/firebase_services.dart';
 
 class ForgetPassword extends StatefulWidget {
   const ForgetPassword({super.key});
@@ -30,31 +31,36 @@ class _ForgetPasswordState extends State<ForgetPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(title: Text("Forget Password")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Image(image: AssetImage(ImageAssets.forgetPassword)),
-            SizedBox(height: 24),
-            CustomTextField(
-              controller: _emailController,
-              validation: Validations.validateEmail,
-              hint: "Email",
-              prefixIcon: Icon(Icons.email),
-            ),
-            SizedBox(height: 24),
-            CustomElevatedButton(
-              title: Text(
-                "Verify Email",
-                style: Theme.of(context).textTheme.titleMedium!
-                    .copyWith(fontWeight: FontWeight.normal),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Image(image: AssetImage(ImageAssets.forgetPassword)),
+              SizedBox(height: 24),
+              CustomTextField(
+                controller: _emailController,
+                validation: Validations.validateEmail,
+                hint: "Email",
+                prefixIcon: Icon(Icons.email),
               ),
-              onPressed: () {},
-              backgroundColor: ColorsManager.yellow,
-            ),
-          ],
+              SizedBox(height: 40),
+              CustomElevatedButton(
+                title: Text(
+                  "Verify Email",
+                  style: Theme.of(context).textTheme.titleMedium!
+                      .copyWith(fontWeight: FontWeight.normal),
+                ),
+                onPressed: () {
+                  FirebaseServices.resetPassword(_emailController.text.trim(), context);
+                },
+                backgroundColor: ColorsManager.yellow,
+              ),
+            ],
+          ),
         ),
       ),
     );

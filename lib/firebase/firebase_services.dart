@@ -14,7 +14,6 @@ class FirebaseServices {
     FirebaseFirestore db = FirebaseFirestore.instance;
     return db.collection('users');
   }
-
   static Future<void> addUserToFirestore(UserModel user) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
@@ -23,7 +22,6 @@ class FirebaseServices {
     );
     return userDocument.set(user.toJson());
   }
-
   static Future<UserModel?> getCurrentUser(String userId) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
@@ -34,16 +32,7 @@ class FirebaseServices {
     Map<String, dynamic>? data = snapshot.data();
     return data == null ? null : UserModel.fromJson(data);
   }
-
-  static void register(
-    String name,
-    String email,
-    String password,
-    String phoneNumber,
-    BuildContext context,
-    String avatarName,
-    GlobalKey<FormState> key,
-  ) async {
+  static void register(String name, String email, String password, String phoneNumber, BuildContext context, String avatarName, GlobalKey<FormState> key,) async {
     if (key.currentState!.validate() == false) return;
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -59,6 +48,7 @@ class FirebaseServices {
       if (!context.mounted) {
         return null;
       }
+      Utilities.showToast('Account Created Successfully');
       Navigator.pushReplacementNamed(context, RoutesManager.login);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -83,13 +73,7 @@ class FirebaseServices {
       Utilities.showToast('Something went wrong. Please try again.');
     }
   }
-
-  static void login(
-    String email,
-    String password,
-    BuildContext context,
-    GlobalKey<FormState> key,
-  ) async {
+  static void login(String email, String password, BuildContext context, GlobalKey<FormState> key,) async {
     if (key.currentState!.validate() == false) return;
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -104,6 +88,7 @@ class FirebaseServices {
       if (!context.mounted) {
         return null;
       }
+      Utilities.showToast('Logged In Successfully');
       Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -130,7 +115,6 @@ class FirebaseServices {
       Utilities.showToast('Something went wrong. Please try again.');
     }
   }
-
   static Future<UserCredential?> loginWithGoogle(BuildContext context) async {
     try {
       GoogleSignInAccount googleUser = await GoogleSignIn.instance
@@ -187,11 +171,7 @@ class FirebaseServices {
       return null;
     }
   }
-
-  static Future<UserCredential?> signUpWithGoogle(
-    String phoneNumber,
-    BuildContext context,
-  ) async {
+  static Future<UserCredential?> signUpWithGoogle(String phoneNumber, BuildContext context,) async {
     try {
       GoogleSignInAccount googleUser = await GoogleSignIn.instance
           .authenticate();
@@ -259,12 +239,12 @@ class FirebaseServices {
       return null;
     }
   }
-
   static Future<void> signOut(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn.instance.signOut();
       if (!context.mounted) return;
+      Utilities.showToast('Logged Out Successfully');
       Navigator.pushReplacementNamed(context, RoutesManager.login);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -278,7 +258,6 @@ class FirebaseServices {
       Utilities.showToast('Sign-out failed. Please try again.');
     }
   }
-
   static Future<void> deleteAccount(BuildContext context) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
@@ -291,6 +270,7 @@ class FirebaseServices {
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn.instance.signOut();
       if (!context.mounted) return;
+      Utilities.showToast('Account Deleted Successfully');
       Navigator.pushReplacementNamed(context, RoutesManager.login);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -311,6 +291,8 @@ class FirebaseServices {
       UserModel.loggedInUser!.id,
     );
     userDocument.update(UserModel.loggedInUser!.toJson());
+    if (!context.mounted) return;
+    Utilities.showToast('Profile Updated Successfully');
     Navigator.pop(context);
   }
   static Future<void> addMovieToWishList(Movie movie) async {
@@ -325,6 +307,7 @@ class FirebaseServices {
       UserModel.loggedInUser!.wishListMoviesIds!.add(movie.toJson());
       userDocument.update(UserModel.loggedInUser!.toJson());
     }
+    Utilities.showToast('Movie added to wishlist');
   }
   static Future<void> removeMovieFromWishList(Movie movie) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
@@ -335,5 +318,30 @@ class FirebaseServices {
     UserModel.loggedInUser!.wishListMoviesIds!
         .removeWhere((item) => item['id'] == movie.id);
     userDocument.update(UserModel.loggedInUser!.toJson());
+    Utilities.showToast('Movie removed from wishlist');
+  }
+  static Future<void> resetPassword(String email, BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      if (!context.mounted) return;
+      Utilities.showToast('Password reset email sent');
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'invalid-email':
+          Utilities.showToast('Invalid email address');
+          break;
+        case 'user-not-found':
+          Utilities.showToast('No user found with this email');
+          break;
+        case 'network-request-failed':
+          Utilities.showToast('Network error. Check your connection.');
+          break;
+        default:
+          Utilities.showToast('Password reset failed. Please try again.');
+      }
+    } catch (e) {
+      Utilities.showToast('Password reset failed. Please try again.');
+    }
   }
 }
