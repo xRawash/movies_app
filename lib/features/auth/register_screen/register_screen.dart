@@ -6,10 +6,12 @@ import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/core/validations/validations.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
+import 'package:movies_app/core/widgets/custom_phone_field.dart';
 import 'package:movies_app/core/widgets/custom_text_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/core/widgets/lang_switch.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -22,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
   late TextEditingController _nameController;
-  late TextEditingController _phoneNumberController;
+  late PhoneController _phoneNumberController;
   late TextEditingController _passwordConfirmController;
   late PageController _pageController;
   bool isArabic = false;
@@ -38,7 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     _nameController = TextEditingController();
-    _phoneNumberController = TextEditingController();
+    _phoneNumberController = PhoneController();
     _passwordConfirmController = TextEditingController();
     _pageController = PageController(viewportFraction: 0.35, initialPage: 0);
     selectedAvatarSeed = avatarSeeds[0];
@@ -148,7 +150,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               SizedBox(height: 23),
               CustomTextField(
                 controller: _emailController,
-
                 validation: Validations.validateEmail,
                 hint: "Email",
                 prefixIcon: Icon(Icons.email),
@@ -193,13 +194,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               SizedBox(height: 16),
-              CustomTextField(
-                controller: _phoneNumberController,
-                validation: Validations.validatePhone,
-                textInputType: TextInputType.phone,
-                hint: "Phone Number",
-                prefixIcon: Icon(Icons.phone),
-              ),
+              CustomPhoneField(controller: _phoneNumberController),
               SizedBox(height: 16),
               CustomElevatedButton(
                 title: Text(
@@ -208,11 +203,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       .copyWith(fontWeight: FontWeight.normal),
                 ),
                 onPressed: () {
+                  final phoneStr = _phoneNumberController.value.international;
                   FirebaseServices.register(
                     _nameController.text.trim(),
                     _emailController.text.trim(),
                     _passwordController.text,
-                    _phoneNumberController.text,
+                    phoneStr,
                     context,
                     selectedAvatarSeed,
                     _formKey,
@@ -238,16 +234,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ],
                 ),
                 onPressed: () {
-                  final phoneError = Validations.validatePhone(_phoneNumberController.text.trim());
-                  if(phoneError != null){
+                  final phoneStr = _phoneNumberController.value.international;
+                  if (phoneStr.isEmpty) {
                     Utilities.showToast('Invalid Phone Number');
                     return;
                   }
-                  FirebaseServices.signUpWithGoogle(_phoneNumberController.text.trim(),context);
+                  FirebaseServices.signUpWithGoogle(phoneStr, context);
                 },
                 backgroundColor: ColorsManager.yellow,
               ),
-              SizedBox(height: 16,),
+              SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

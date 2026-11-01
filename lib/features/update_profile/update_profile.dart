@@ -3,10 +3,12 @@ import 'package:movies_app/api/avatar_seeds/avatar_seeds.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
+import 'package:movies_app/core/widgets/custom_phone_field.dart';
 import 'package:movies_app/core/widgets/custom_text_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/models/user_model.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 
 class UpdateProfile extends StatefulWidget {
   const UpdateProfile({super.key});
@@ -19,14 +21,21 @@ class _UpdateProfileState extends State<UpdateProfile> {
   UserModel currentUser = UserModel.loggedInUser!;
   late String avatarSeed;
   late TextEditingController _nameController;
-  late TextEditingController _phoneController;
-
+  late PhoneController _phoneController;
+  PhoneNumber? initialPhone;
   @override
   void initState() {
     super.initState();
     avatarSeed = currentUser.avatarName ?? " ";
     _nameController = TextEditingController(text: currentUser.name);
-    _phoneController = TextEditingController(text: currentUser.phone);
+    if (currentUser.phone != null && currentUser.phone!.isNotEmpty) {
+      try {
+        initialPhone = PhoneNumber.parse(currentUser.phone!);
+      } catch (e) {
+        initialPhone = null;
+      }
+    }
+    _phoneController = PhoneController(initialValue: initialPhone!);
   }
 
   @override
@@ -55,7 +64,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: ColorsManager.darkGrey,
-                      borderRadius: BorderRadius.circular(24)
+                      borderRadius: BorderRadius.circular(24),
                     ),
                     child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -74,7 +83,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           margin: EdgeInsets.all(18),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            border: BoxBorder.all(width: 3, color: ColorsManager.yellow),
+                            border: BoxBorder.all(
+                              width: 3,
+                              color: ColorsManager.yellow,
+                            ),
                           ),
                           child: ClipOval(
                             child: Image.network(
@@ -110,10 +122,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
               prefixIcon: Icon(Icons.person),
             ),
             SizedBox(height: 20),
-            CustomTextField(
+            CustomPhoneField(
               controller: _phoneController,
               hint: "Enter your phone number",
-              prefixIcon: Icon(Icons.phone),
             ),
             SizedBox(height: 20),
             Align(
@@ -147,7 +158,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
               ),
               onPressed: () async {
                 UserModel.loggedInUser!.name = _nameController.text;
-                UserModel.loggedInUser!.phone = _phoneController.text;
+                UserModel.loggedInUser!.phone =
+                    _phoneController.value.international;
                 await FirebaseServices.updateProfile(context);
               },
               backgroundColor: ColorsManager.yellow,

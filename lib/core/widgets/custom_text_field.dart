@@ -50,11 +50,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return TextFormField(
       onChanged: widget.onChanged,
       controller: widget.controller,
-      obscureText: widget.obscureText,
+      obscureText: isObscured,
       obscuringCharacter: '*',
       style: TextStyle(fontSize: 16, color: Colors.white),
       validator: widget.validation,
-      autovalidateMode: AutovalidateMode.always,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       keyboardType: widget.textInputType,
       decoration: InputDecoration(
         suffixIcon: widget.obscureText ? obscureIcon() : widget.suffixIcon,
