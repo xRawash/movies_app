@@ -58,6 +58,7 @@ class RoutesManager {
             builder: (context) => TorrentPlayerScreen(
               magnetLink: args?['magnetLink'] ?? '',
               torrentId: args?['torrentId'] ?? '',
+              movie: args!['movie'],
             ),
           );
         }

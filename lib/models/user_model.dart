@@ -5,8 +5,8 @@ class UserModel {
   String? email;
   String? phone;
   String? avatarName;
-  List<Map<String, dynamic>>? wishListMoviesIds;
-  List<Map<String, dynamic>>? watchedMoviesIds;
+  List<Map<String, dynamic>>? wishListMovies;
+  List<Map<String, dynamic>>? watchedMovies;
   UserModel({
     required this.name,
     required this.id,
@@ -15,7 +15,7 @@ class UserModel {
     this.avatarName,
     List<Map<String, dynamic>>? wishListMoviesIds,
     List<Map<String, dynamic>>? watchedMoviesIds,
-  }) : watchedMoviesIds = watchedMoviesIds ?? [], wishListMoviesIds = wishListMoviesIds ?? [];
+  }) : watchedMovies = watchedMoviesIds ?? [], wishListMovies = wishListMoviesIds ?? [];
 
 
   UserModel.fromJson(Map<String, dynamic> json) {
@@ -24,8 +24,8 @@ class UserModel {
     email = json['email'];
     phone = json['phone'];
     avatarName = json['avatar'];
-    wishListMoviesIds = List<Map<String, dynamic>>.from(json['watchList'] ?? const []);
-    watchedMoviesIds = List<Map<String, dynamic>>.from(json['history'] ?? const []);
+    wishListMovies = List<Map<String, dynamic>>.from(json['watchList'] ?? const []);
+    watchedMovies = List<Map<String, dynamic>>.from(json['history'] ?? const []);
   }
 
   Map<String, dynamic> toJson() {
@@ -35,8 +35,8 @@ class UserModel {
       'email': email,
       'phone': phone,
       'avatar': avatarName,
-      'watchList': wishListMoviesIds,
-      'history': watchedMoviesIds,
+      'watchList': wishListMovies,
+      'history': watchedMovies,
     };
   }
 }

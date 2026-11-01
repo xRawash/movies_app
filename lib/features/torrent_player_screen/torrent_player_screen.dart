@@ -1,5 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:movies_app/api/movie_detailed_response/Movie.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/features/torrent_player_screen/torrent_player_controller.dart';
 
@@ -8,9 +9,11 @@ class TorrentPlayerScreen extends StatefulWidget {
     super.key,
     required this.magnetLink,
     required this.torrentId,
+    required this.movie
   });
   final String torrentId;
   final String magnetLink;
+  final Movie movie;
 
   @override
   State<TorrentPlayerScreen> createState() => _TorrentPlayerScreenState();
@@ -25,6 +28,7 @@ class _TorrentPlayerScreenState extends State<TorrentPlayerScreen> {
     _controller = TorrentPlayerController(
       magnetLink: widget.magnetLink,
       torrentId: widget.torrentId,
+      movie: widget.movie
     )..start();
   }
 

@@ -23,17 +23,14 @@ void showResolutionDialog(BuildContext context, Movie movie) {
     }
   }
 
-  if (magnetLink_720p.isEmpty &&
-      movie.torrents != null &&
-      movie.torrents!.isNotEmpty) {
+  if (magnetLink_720p.isEmpty && movie.torrents != null && movie.torrents!.isNotEmpty) {
     final t = movie.torrents![0];
     torrentId_720p = t.hash ?? '';
     magnetLink_720p =
         "magnet:?xt=urn:btih:${t.hash}&dn=${Uri.encodeComponent(movie.title ?? '')}&tr=udp://tracker.opentrackr.org:1337/announce&tr=udp://tracker.torrent.eu.org:451/announce&tr=udp://open.stealth.si:80/announce";
   }
-  if (magnetLink_1080p.isEmpty &&
-      movie.torrents != null &&
-      movie.torrents!.length > 1) {
+  if (magnetLink_1080p.isEmpty && movie.torrents != null && movie.torrents!.length > 1)
+  {
     final t = movie.torrents![1];
     torrentId_1080p = t.hash ?? '';
     magnetLink_1080p =
@@ -68,6 +65,7 @@ void showResolutionDialog(BuildContext context, Movie movie) {
                       'torrentId': torrentId_720p.isNotEmpty
                           ? torrentId_720p
                           : '1',
+                      'movie': movie,
                     },
                   );
                 },
@@ -85,6 +83,7 @@ void showResolutionDialog(BuildContext context, Movie movie) {
                       'torrentId': torrentId_1080p.isNotEmpty
                           ? torrentId_1080p
                           : '1',
+                      'movie': movie,
                     },
                   );
                 },

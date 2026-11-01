@@ -301,13 +301,22 @@ class FirebaseServices {
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    bool exists = UserModel.loggedInUser!.wishListMoviesIds!
+    bool exists = UserModel.loggedInUser!.wishListMovies!
         .any((item) => item['id'] == movie.id);
     if (!exists) {
-      UserModel.loggedInUser!.wishListMoviesIds!.add(movie.toJson());
+      UserModel.loggedInUser!.wishListMovies!.add(movie.toJson());
       userDocument.update(UserModel.loggedInUser!.toJson());
     }
     Utilities.showToast('Movie added to wishlist');
+  }
+  static Future<void> addMovieToHistory (Movie movie) async {
+    CollectionReference<Map<String, dynamic>> usersCollection = _getUsersCollectionReference();
+    DocumentReference<Map<String, dynamic>> userDox = usersCollection.doc(UserModel.loggedInUser!.id);
+    bool exists = UserModel.loggedInUser!.watchedMovies!.any((item) => item['id'] == movie.id);
+    if(!exists){
+      UserModel.loggedInUser!.watchedMovies!.add(movie.toJson());
+      userDox.update(UserModel.loggedInUser!.toJson());
+    }
   }
   static Future<void> removeMovieFromWishList(Movie movie) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
@@ -315,7 +324,7 @@ class FirebaseServices {
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    UserModel.loggedInUser!.wishListMoviesIds!
+    UserModel.loggedInUser!.wishListMovies!
         .removeWhere((item) => item['id'] == movie.id);
     userDocument.update(UserModel.loggedInUser!.toJson());
     Utilities.showToast('Movie removed from wishlist');

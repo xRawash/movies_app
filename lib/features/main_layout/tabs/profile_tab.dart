@@ -30,8 +30,8 @@ class _ProfileTabState extends State<ProfileTab> {
   Widget build(BuildContext context) {
     currentUser = UserModel.loggedInUser!;
     List<Map<String, dynamic>> movies = selectedTab == 0
-        ? (currentUser.wishListMoviesIds ?? [])
-        : (currentUser.watchedMoviesIds ?? []);
+        ? (currentUser.wishListMovies ?? [])
+        : (currentUser.watchedMovies ?? []);
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -70,7 +70,7 @@ class _ProfileTabState extends State<ProfileTab> {
                         child: Column(
                           children: [
                             Text(
-                              (currentUser.wishListMoviesIds ?? []).length.toString(),
+                              (currentUser.wishListMovies ?? []).length.toString(),
                               style: Theme.of(context).textTheme.labelLarge!
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),
@@ -85,7 +85,7 @@ class _ProfileTabState extends State<ProfileTab> {
                         child: Column(
                           children: [
                             Text(
-                              (currentUser.watchedMoviesIds ?? []).length.toString(),
+                              (currentUser.watchedMovies ?? []).length.toString(),
                               style: Theme.of(context).textTheme.labelLarge!
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),

@@ -61,6 +61,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   backgroundColor: Colors.transparent,
                   context: context,
                   builder: (context) => Container(
+                    margin: EdgeInsets.all(16),
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: ColorsManager.darkGrey,

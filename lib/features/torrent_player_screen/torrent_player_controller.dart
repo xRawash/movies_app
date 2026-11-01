@@ -3,16 +3,19 @@ import 'dart:async';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:libtorrent_flutter/libtorrent_flutter.dart';
+import 'package:movies_app/api/movie_detailed_response/Movie.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
+import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/prefs_manager/prefs_manager.dart';
 import 'package:video_player/video_player.dart';
 
 class TorrentPlayerController extends ChangeNotifier {
   final String torrentId;
   final String magnetLink;
-  TorrentPlayerController({required this.magnetLink, required this.torrentId});
+  TorrentPlayerController({required this.magnetLink, required this.torrentId, required this.movie});
   final _engine = LibtorrentFlutter.instance;
   String get _resumeKey => 'resume_$torrentId';
+  Movie movie;
 
   int? _torrentNativeId;
   StreamSubscription? _torrentSub;
@@ -131,6 +134,7 @@ class TorrentPlayerController extends ChangeNotifier {
     final nearEnd = v.duration.inMilliseconds - position < 10000;
     if (nearEnd) {
       PrefsManager.prefs.remove(_resumeKey);
+      FirebaseServices.addMovieToHistory(movie);
     } else {
       PrefsManager.prefs.setInt(_resumeKey, position);
     }

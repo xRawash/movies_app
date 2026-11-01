@@ -20,7 +20,7 @@ class _MovieDetailsState extends State<MovieDetails> {
   Widget build(BuildContext context) {
     Movie movie = ModalRoute.of(context)!.settings.arguments as Movie;
     bool isBookMarked =
-        UserModel.loggedInUser?.wishListMoviesIds?.any(
+        UserModel.loggedInUser?.wishListMovies?.any(
           (item) => item['id'] == movie.id,
         ) ??
         false;
