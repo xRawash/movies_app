@@ -16,5 +16,4 @@ class Data {
     }
     return map;
   }
-
 }

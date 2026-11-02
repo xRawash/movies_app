@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/features/torrent_player_screen/torrent_player_controller.dart';
+import 'package:movies_app/features/torrent_player_screen/widgets/loading_view.dart';
 
 class TorrentPlayerScreen extends StatefulWidget {
   const TorrentPlayerScreen({
@@ -89,10 +90,7 @@ class _TorrentPlayerScreenState extends State<TorrentPlayerScreen> {
             if (_controller.isReady) {
               return Chewie(controller: _controller.chewieController!);
             }
-            return _LoadingView(
-              bufferPct: _controller.bufferPct,
-              progress: _controller.progress,
-            );
+            return LoadingView();
           },
         ),
       ),
@@ -100,28 +98,3 @@ class _TorrentPlayerScreenState extends State<TorrentPlayerScreen> {
   }
 }
 
-class _LoadingView extends StatelessWidget {
-  final double progress;
-  final int bufferPct;
-  const _LoadingView({required this.bufferPct, required this.progress});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const CircularProgressIndicator(color: Colors.white),
-        const SizedBox(height: 24),
-        Text(
-          "Torrent Progress: ${(progress * 100).toStringAsFixed(1)}%",
-          style: const TextStyle(color: Colors.white),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          "Buffered ahead: $bufferPct%",
-          style: TextStyle(color: ColorsManager.grey),
-        ),
-      ],
-    );
-  }
-}

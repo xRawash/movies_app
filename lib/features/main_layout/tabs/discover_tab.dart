@@ -6,6 +6,7 @@ import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 import 'package:movies_app/features/main_layout/widgets/custom_tab_bar.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class DiscoverTab extends StatefulWidget {
   const DiscoverTab({super.key});
@@ -51,35 +52,43 @@ class _DiscoverTabState extends State<DiscoverTab> {
             child: FutureBuilder<MoviesResponse>(
               future: genreMoviesFuture,
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(color: ColorsManager.yellow),
-                  );
-                }
-                if (snapshot.hasError ||
-                    snapshot.data?.data == null ||
-                    snapshot.data!.data!.movies == null ||
-                    snapshot.data!.data!.movies!.isEmpty) {
+                bool isLoading = snapshot.connectionState == ConnectionState.waiting;
+                if (snapshot.hasError) {
                   return Center(
                     child: Text(
-                      "No movies found",
+                      "Failed to load movies",
                       style: TextStyle(color: Colors.white70, fontSize: 16),
                     ),
                   );
                 }
-                List<Movies> movies = snapshot.data!.data!.movies!;
-                return GridView.builder(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.65,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
+
+                List<Movies> movies = (snapshot.hasData && snapshot.data?.data?.movies != null)
+                    ? snapshot.data!.data!.movies!
+                    : List.generate(
+                        10,
+                        (index) => Movies(
+                          title: "Loading Movie",
+                          rating: 0.0,
+                          year: 2024,
+                          mediumCoverImage: "",
+                        ),
+                      );
+
+                return Skeletonizer(
+                  enabled: isLoading,
+                  child: GridView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.65,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                    ),
+                    itemCount: movies.length,
+                    itemBuilder: (context, index) {
+                      return MovieItem(movie: movies[index]);
+                    },
                   ),
-                  itemCount: movies.length,
-                  itemBuilder: (context, index) {
-                    return MovieItem(movie: movies[index]);
-                  },
                 );
               },
             ),

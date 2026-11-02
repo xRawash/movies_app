@@ -3,6 +3,7 @@ import 'package:movies_app/features/auth/forget_password/forget_password.dart';
 import 'package:movies_app/features/auth/login_screen/login_screen.dart';
 import 'package:movies_app/features/auth/register_screen/register_screen.dart';
 import 'package:movies_app/features/main_layout/main_screen.dart';
+import 'package:movies_app/features/main_layout/movies_by_genre/movies_by_genres.dart';
 import 'package:movies_app/features/movie_details/movie_details.dart';
 import 'package:movies_app/features/torrent_player_screen/torrent_player_screen.dart';
 import 'package:movies_app/features/update_profile/update_profile.dart';
@@ -17,6 +18,7 @@ class RoutesManager {
   static const String updateProfile = '/updateProfile';
   static const String movieDetails = '/movieDetails';
   static const String torrentPlayer = '/torrentPlayer';
+  static const String moviesByGenre = '/moviesByGenre';
 
   static Route? getRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -59,6 +61,14 @@ class RoutesManager {
               magnetLink: args?['magnetLink'] ?? '',
               torrentId: args?['torrentId'] ?? '',
               movie: args!['movie'],
+            ),
+          );
+        }
+        case moviesByGenre: {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => MoviesByGenres(
+              genreId: args?['genreId'] ?? '',
             ),
           );
         }

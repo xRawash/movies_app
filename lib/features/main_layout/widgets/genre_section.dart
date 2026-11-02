@@ -3,10 +3,13 @@ import 'package:movies_app/api/api_services.dart';
 import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/api/movie_response/movies_response.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
+import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class GenreSection extends StatefulWidget {
   const GenreSection({super.key, required this.genre});
+
   final String genre;
 
   @override
@@ -42,7 +45,9 @@ class _GenreSectionState extends State<GenreSection> {
                     ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, RoutesManager.moviesByGenre, arguments: {'genreId': widget.genre});
+                },
                 child: Text(
                   "See More  →",
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -60,34 +65,42 @@ class _GenreSectionState extends State<GenreSection> {
           child: FutureBuilder<MoviesResponse>(
             future: genreFuture,
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(color: ColorsManager.yellow),
-                );
-              }
-              if (snapshot.hasError ||
-                  snapshot.data?.data == null ||
-                  snapshot.data!.data!.movies == null ||
-                  snapshot.data!.data!.movies!.isEmpty) {
+              bool isLoading = snapshot.connectionState == ConnectionState.waiting;
+              if (snapshot.hasError) {
                 return Center(
                   child: Text(
-                    "No movies found",
+                    "Error loading",
                     style: TextStyle(color: Colors.white70),
                   ),
                 );
               }
-              List<Movies> movies = snapshot.data!.data!.movies!.take(15).toList();
-              return ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: movies.length,
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                itemBuilder: (context, index) {
-                  return Container(
-                    width: 140,
-                    margin: EdgeInsets.only(right: 12),
-                    child: MovieItem(movie: movies[index]),
-                  );
-                },
+
+              List<Movies> movies = (snapshot.hasData && snapshot.data?.data?.movies != null)
+                  ? snapshot.data!.data!.movies!.take(15).toList()
+                  : List.generate(
+                      6,
+                      (index) => Movies(
+                        title: "Loading Movie",
+                        rating: 0.0,
+                        year: 2024,
+                        mediumCoverImage: "",
+                      ),
+                    );
+
+              return Skeletonizer(
+                enabled: isLoading,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: movies.length,
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  itemBuilder: (context, index) {
+                    return Container(
+                      width: 140,
+                      margin: EdgeInsets.only(right: 12),
+                      child: MovieItem(movie: movies[index]),
+                    );
+                  },
+                ),
               );
             },
           ),
