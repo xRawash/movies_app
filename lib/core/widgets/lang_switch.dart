@@ -2,6 +2,8 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
+import 'package:movies_app/provider/config_provider.dart';
+import 'package:provider/provider.dart';
 
 class LangSwitch extends StatefulWidget {
   const LangSwitch({super.key});
@@ -14,6 +16,8 @@ class _LangSwitchState extends State<LangSwitch> {
   bool isArabic = false;
   @override
   Widget build(BuildContext context) {
+    ConfigProvider configProvider = Provider.of<ConfigProvider>(context);
+    isArabic = configProvider.language == 'ar';
     return AnimatedToggleSwitch<bool>.size(
       current: isArabic,
       values: const [false, true],
@@ -52,6 +56,11 @@ class _LangSwitchState extends State<LangSwitch> {
       },
       onChanged: (value) {
         setState(() {
+          if (value) {
+            configProvider.setLanguage('ar');
+          } else {
+            configProvider.setLanguage('en');
+          }
           isArabic = value;
         });
       },

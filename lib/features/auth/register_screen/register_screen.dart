@@ -11,6 +11,7 @@ import 'package:movies_app/core/widgets/custom_text_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/core/widgets/lang_switch.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
+import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -59,8 +60,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text("Register")),
+      appBar: AppBar(title: Text(l10n.register)),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -144,14 +146,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
               CustomTextField(
                 controller: _nameController,
                 validation: Validations.validateName,
-                hint: "Name",
+                hint: l10n.name,
                 prefixIcon: Icon(Icons.perm_identity_outlined),
               ),
               SizedBox(height: 23),
               CustomTextField(
                 controller: _emailController,
                 validation: Validations.validateEmail,
-                hint: "Email",
+                hint: l10n.email,
                 prefixIcon: Icon(Icons.email),
               ),
               SizedBox(height: 23),
@@ -159,7 +161,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _passwordController,
                 validation: Validations.validatePassword,
                 obscureText: isObscured,
-                hint: "Password",
+                hint: l10n.password,
                 prefixIcon: Icon(Icons.lock),
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -180,7 +182,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   _passwordController.text,
                 ),
                 obscureText: isObscured,
-                hint: "Confirm Password",
+                hint: l10n.confirmPassword,
                 prefixIcon: Icon(Icons.lock),
                 suffixIcon: IconButton(
                   onPressed: () {
@@ -198,7 +200,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               SizedBox(height: 16),
               CustomElevatedButton(
                 title: Text(
-                  "Create Account",
+                  l10n.createAccount,
                   style: Theme.of(context).textTheme.titleMedium!
                       .copyWith(fontWeight: FontWeight.normal),
                 ),
@@ -227,7 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     SizedBox(width: 8),
                     Text(
-                      "SignUp With Google",
+                      l10n.signUpWithGoogle,
                       style: Theme.of(context).textTheme.titleMedium!
                           .copyWith(fontWeight: FontWeight.normal),
                     ),
@@ -247,7 +249,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Already Have Account ?"),
+                  Text(l10n.alreadyHaveAccount),
                   CustomTextButton(
                     onPressed: () {
                       Navigator.pushReplacementNamed(
@@ -256,7 +258,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       );
                     },
                     title: Text(
-                      "Login",
+                      l10n.login,
                       style: Theme.of(context).textTheme.labelSmall!
                           .copyWith(fontWeight: FontWeight.bold),
                     ),

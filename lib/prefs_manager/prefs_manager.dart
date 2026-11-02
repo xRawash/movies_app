@@ -11,4 +11,10 @@ class PrefsManager {
   static bool? getIsFinishedOnboarding () {
     return prefs.getBool('finishedOnboarding');
   }
+  static void saveCurrentLang (String lang){
+    prefs.setString('currentLang', lang);
+  }
+  static String? getCurrentLang (){
+    return prefs.getString('currentLang');
+  }
 }

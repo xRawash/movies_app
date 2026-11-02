@@ -5,6 +5,7 @@ import 'package:movies_app/core/validations/validations.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
+import 'package:movies_app/l10n/app_localizations.dart';
 
 class ForgetPassword extends StatefulWidget {
   const ForgetPassword({super.key});
@@ -30,9 +31,10 @@ class _ForgetPasswordState extends State<ForgetPassword> {
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context)!;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(title: Text("Forget Password")),
+      appBar: AppBar(title: Text(l10n.forgetPassword)),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -44,13 +46,13 @@ class _ForgetPasswordState extends State<ForgetPassword> {
               CustomTextField(
                 controller: _emailController,
                 validation: Validations.validateEmail,
-                hint: "Email",
+                hint: l10n.email,
                 prefixIcon: Icon(Icons.email),
               ),
               SizedBox(height: 40),
               CustomElevatedButton(
                 title: Text(
-                  "Verify Email",
+                  l10n.verifyEmail,
                   style: Theme.of(context).textTheme.titleMedium!
                       .copyWith(fontWeight: FontWeight.normal),
                 ),

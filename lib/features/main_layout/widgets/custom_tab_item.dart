@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 
 class CustomTabItem extends StatelessWidget {
   const CustomTabItem({
@@ -20,7 +21,7 @@ class CustomTabItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String title = genre[0].toUpperCase() + genre.substring(1);
+    String title = GenresIds.getLocalizedGenre(context, genre);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
