@@ -19,12 +19,26 @@ class MovieDetails extends StatefulWidget {
 }
 
 class _MovieDetailsState extends State<MovieDetails> {
+  late Future<MovieDetailedResponse> _movieDetailsFuture;
+  Movies? nonDetailedMovie;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (nonDetailedMovie == null) {
+      nonDetailedMovie = ModalRoute.of(context)!.settings.arguments as Movies;
+      _movieDetailsFuture = ApiServices.getMovieDetails(nonDetailedMovie!.id.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Movies nonDetailedMovie = ModalRoute.of(context)!.settings.arguments as Movies;
+    if (nonDetailedMovie == null) {
+      return const Scaffold(body: SizedBox.shrink());
+    }
 
     return FutureBuilder<MovieDetailedResponse>(
-      future: ApiServices.getMovieDetails(nonDetailedMovie.id.toString()),
+      future: _movieDetailsFuture,
       builder: (context, snapshot) {
         bool isLoading = snapshot.connectionState == ConnectionState.waiting;
         if (snapshot.hasError) {
@@ -40,14 +54,14 @@ class _MovieDetailsState extends State<MovieDetails> {
           detailedMovie = snapshot.data!.data!.movie!;
         } else {
           detailedMovie = Movie(
-            title: nonDetailedMovie.title ?? "Loading Title...",
-            year: nonDetailedMovie.year ?? 2024,
-            rating: nonDetailedMovie.rating ?? 0.0,
+            title: nonDetailedMovie!.title ?? "Loading Title...",
+            year: nonDetailedMovie!.year ?? 2024,
+            rating: nonDetailedMovie!.rating ?? 0.0,
             likeCount: 0,
             runtime: 0,
             descriptionFull: "Loading movie description...",
-            largeCoverImage: nonDetailedMovie.largeCoverImage,
-            mediumCoverImage: nonDetailedMovie.mediumCoverImage,
+            largeCoverImage: nonDetailedMovie!.largeCoverImage,
+            mediumCoverImage: nonDetailedMovie!.mediumCoverImage,
             genres: ['Action', 'Drama'],
             cast: [],
             torrents: [],
