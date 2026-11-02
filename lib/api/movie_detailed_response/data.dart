@@ -1,4 +1,4 @@
-import 'Movie.dart';
+import 'movie.dart';
 
 class Data {
   Data({

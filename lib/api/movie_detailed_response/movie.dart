@@ -1,7 +1,7 @@
-import 'package:movies_app/api/movie_response/Movies.dart';
+import 'package:movies_app/api/movie_response/movies.dart';
 
-import 'Cast.dart';
-import 'Torrents.dart';
+import 'cast.dart';
+import 'torrents.dart';
 
 class Movie {
   Movie({
@@ -93,18 +93,18 @@ class Movie {
     dateUploaded = json['date_uploaded'];
     dateUploadedUnix = json['date_uploaded_unix'];
   }
-  int? id;
+  num? id;
   String? url;
   String? imdbCode;
   String? title;
   String? titleEnglish;
   String? titleLong;
   String? slug;
-  int? year;
-  double? rating;
-  int? runtime;
+  num? year;
+  num? rating;
+  num? runtime;
   List<String>? genres;
-  int? likeCount;
+  num? likeCount;
   String? descriptionIntro;
   String? descriptionFull;
   String? ytTrailerCode;
@@ -124,7 +124,7 @@ class Movie {
   List<Cast>? cast;
   List<Torrents>? torrents;
   String? dateUploaded;
-  int? dateUploadedUnix;
+  num? dateUploadedUnix;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

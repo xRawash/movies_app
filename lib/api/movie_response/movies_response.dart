@@ -1,13 +1,13 @@
-import 'Data.dart';
+import 'data.dart';
 
-class MovieDetailedResponse {
-  MovieDetailedResponse({
+class MoviesResponse {
+  MoviesResponse({
       this.status, 
       this.statusMessage, 
       this.data, 
-      });
+     });
 
-  MovieDetailedResponse.fromJson(dynamic json) {
+  MoviesResponse.fromJson(dynamic json) {
     status = json['status'];
     statusMessage = json['status_message'];
     data = json['data'] != null ? Data.fromJson(json['data']) : null;
@@ -15,6 +15,7 @@ class MovieDetailedResponse {
   String? status;
   String? statusMessage;
   Data? data;
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

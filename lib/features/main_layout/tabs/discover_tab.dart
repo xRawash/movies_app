@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/api/api_services.dart';
-import 'package:movies_app/api/movie_response/Movies.dart';
-import 'package:movies_app/api/movie_response/Movies_response.dart';
+import 'package:movies_app/api/movie_response/movies.dart';
+import 'package:movies_app/api/movie_response/movies_response.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
-import 'package:movies_app/features/main_layout/movie_item/movie_item.dart';
 import 'package:movies_app/features/main_layout/widgets/custom_tab_bar.dart';
+import 'package:movies_app/features/movie_item/movie_item.dart';
 
 class DiscoverTab extends StatefulWidget {
   const DiscoverTab({super.key});

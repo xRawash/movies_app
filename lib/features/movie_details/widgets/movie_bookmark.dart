@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/api/movie_detailed_response/Movie.dart';
+import 'package:movies_app/api/movie_detailed_response/movie.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/models/user_model.dart';
 

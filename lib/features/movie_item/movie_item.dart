@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/api/api_services.dart';
-import 'package:movies_app/api/movie_detailed_response/Movie.dart';
-import 'package:movies_app/api/movie_detailed_response/Movie_detailed_response.dart';
-import 'package:movies_app/api/movie_response/Movies.dart';
-import 'package:movies_app/api/movie_response/Movies_response.dart';
+import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
+import 'package:movies_app/core/sources/routes_manager.dart';
 
 class MovieItem extends StatelessWidget {
   const MovieItem({super.key, required this.movie, this.onNavigateBack});
@@ -15,7 +12,7 @@ class MovieItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        _goToMovieDetails(context);
+        Navigator.pushNamed(context, RoutesManager.movieDetails, arguments: movie);
       },
       child: AspectRatio(
         aspectRatio: 2 / 3,
@@ -81,17 +78,5 @@ class MovieItem extends StatelessWidget {
     );
   }
 
-  Future<void> _goToMovieDetails(BuildContext context) async {
-    MoviesResponse moviesResponse = await ApiServices.getMovieSuggestions(movie.id.toString());
-    List<Movies> similarMovies = moviesResponse.data?.movies ?? [];
-    MovieDetailedResponse movieResponse = await ApiServices.getMovieDetails(movie.id.toString());
-    Movie? movieDetailed = movieResponse.data!.movie;
-    movieDetailed?.similarMovies = similarMovies;
-    if (!context.mounted) return;
-    await Navigator.pushNamed(context, '/movieDetails', arguments: movieDetailed);
-    if (onNavigateBack != null) {
-      onNavigateBack!();
-    }
-  }
 
 }

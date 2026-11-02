@@ -1,6 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:movies_app/api/movie_detailed_response/Movie.dart';
+import 'package:movies_app/api/movie_detailed_response/movie.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/features/torrent_player_screen/torrent_player_controller.dart';
 

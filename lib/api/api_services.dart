@@ -1,8 +1,9 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
-import 'package:movies_app/api/movie_detailed_response/Movie_detailed_response.dart';
-import 'package:movies_app/api/movie_response/Movies.dart';
-import 'package:movies_app/api/movie_response/Movies_response.dart';
+import 'package:movies_app/api/movie_detailed_response/movie_detailed_response.dart';
+import 'package:movies_app/api/movie_response/movies.dart';
+import 'package:movies_app/api/movie_response/movies_response.dart';
 
 class ApiServices {
   static const String _authority = "movies-api.accel.li";
@@ -33,26 +34,32 @@ class ApiServices {
     MoviesResponse moviesResponse = MoviesResponse.fromJson(json);
     return moviesResponse;
   }
-  static Future<MovieDetailedResponse> getMovieDetails(String movieId) async {
-    Uri url = Uri.https(_authority,_movieDetailsEndPoint, {
-      'movie_id': movieId,
-      'with_images': 'true',
-      'with_cast': 'true'
-    });
-    http.Response serverResponse = await http.get(url);
-    Map<String, dynamic> json = jsonDecode(serverResponse.body);
-    MovieDetailedResponse movieDetailedResponse = MovieDetailedResponse.fromJson(json);
-    return movieDetailedResponse ;
-  }
+
   static Future<MoviesResponse> getMovieSuggestions(String movieId) async {
-    Uri url = Uri.https(_authority,_movieSuggestions, {
-      'movie_id': movieId,
-    });
+    Uri url = Uri.https(_authority, _movieSuggestions, {'movie_id': movieId});
     http.Response serverResponse = await http.get(url);
     Map<String, dynamic> json = jsonDecode(serverResponse.body);
     MoviesResponse moviesResponse = MoviesResponse.fromJson(json);
     return moviesResponse;
   }
+
+  static Future<MovieDetailedResponse> getMovieDetails(String movieId) async {
+    Uri url = Uri.https(_authority, _movieDetailsEndPoint, {
+      'movie_id': movieId,
+      'with_images': 'true',
+      'with_cast': 'true',
+    });
+    http.Response serverResponse = await http.get(url);
+    Map<String, dynamic> json = jsonDecode(serverResponse.body);
+    MovieDetailedResponse movieDetailedResponse =
+        MovieDetailedResponse.fromJson(json);
+    MoviesResponse moviesResponse = await ApiServices.getMovieSuggestions(
+      movieId
+    );
+    movieDetailedResponse.data!.movie!.similarMovies = moviesResponse.data?.movies ?? [];
+    return movieDetailedResponse;
+  }
+
   static Future<Movies> getMovieById(String movieId) async {
     Uri url = Uri.https(_authority, _moviesEndPoint, {'movie_id': movieId});
     http.Response serverResponse = await http.get(url);

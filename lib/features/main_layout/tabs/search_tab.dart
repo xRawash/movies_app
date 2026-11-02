@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/api/api_services.dart';
-import 'package:movies_app/api/movie_response/Movies.dart';
+import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
-import 'package:movies_app/features/main_layout/movie_item/movie_item.dart';
+import 'package:movies_app/features/movie_item/movie_item.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});

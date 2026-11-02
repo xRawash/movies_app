@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:libtorrent_flutter/libtorrent_flutter.dart';
-import 'package:movies_app/api/movie_detailed_response/Movie.dart';
+import 'package:movies_app/api/movie_detailed_response/movie.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/prefs_manager/prefs_manager.dart';
