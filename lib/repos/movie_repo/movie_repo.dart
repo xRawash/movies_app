@@ -8,4 +8,7 @@ class MovieRepo {
   Future<MoviesResponse> getMoviesByGenre(String genre) {
     return ApiServices.getMoviesByGenre(genre);
   }
+  Future<MoviesResponse> getSearchResults(String query) {
+    return ApiServices.searchMovies(query);
+  }
 }

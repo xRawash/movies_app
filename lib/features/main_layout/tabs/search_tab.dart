@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:movies_app/api/api_services.dart';
 import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
+import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
+import 'package:movies_app/repos/movie_repo/movie_repo.dart';
+import 'package:movies_app/view_models/search_view_model/search_view_model.dart';
+import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});
@@ -15,8 +20,6 @@ class SearchTab extends StatefulWidget {
 
 class _SearchTabState extends State<SearchTab> {
   late TextEditingController _searchController;
-  List<Movies> searchResults = [];
-  bool isLoading = false;
 
   @override
   void initState() {
@@ -30,81 +33,88 @@ class _SearchTabState extends State<SearchTab> {
     super.dispose();
   }
 
-  Future<void> _searchMovies(String query) async {
-    if (query.trim().isEmpty) {
-      setState(() {
-        searchResults = [];
-        isLoading = false;
-      });
-      return;
-    }
-
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      final response = await ApiServices.searchMovies(query.trim());
-      setState(() {
-        searchResults = response.data?.movies ?? [];
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        searchResults = [];
-        isLoading = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            CustomTextField(
-              controller: _searchController,
-              hint: l10n.search,
-              prefixIcon: Icon(Icons.search),
-              onChanged: (value) {
-                _searchMovies(value ?? '');
-                return null;
-              },
-            ),
-            SizedBox(height: 16),
-            Expanded(
-              child: isLoading
-                  ? Center(
-                      child: CircularProgressIndicator(
-                        color: ColorsManager.yellow,
-                      ),
-                    )
-                  : searchResults.isEmpty
-                      ? Center(
+    return ChangeNotifierProvider(
+      create: (_) => SearchViewModel(movieRepo: MovieRepo()),
+      child: Builder(
+        builder: (context) =>
+         SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                CustomTextField(
+                  controller: _searchController,
+                  hint: l10n.search,
+                  prefixIcon: Icon(Icons.search),
+                  onChanged: (value) {
+                   context.read<SearchViewModel>().searchMovies(value ?? '');
+                   return null;
+                  },
+                ),
+                SizedBox(height: 16),
+                Expanded(
+                  child: Consumer<SearchViewModel>(
+                    builder: (context, viewModel, child){
+                      if(viewModel.query.isEmpty){
+                        return Center(
                           child: Text(
-                            _searchController.text.isEmpty
-                                ? l10n.searchForFavoriteMovies
-                                : l10n.noMoviesFound,
+                            l10n.searchForFavoriteMovies,
                             style: TextStyle(color: Colors.white70, fontSize: 16),
                           ),
-                        )
-                      : GridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.65,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
+                        );
+
+                      }
+                      if(viewModel.isLoading){
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: ColorsManager.yellow,
                           ),
-                          itemCount: searchResults.length,
+                        );
+
+                      }
+                      if(viewModel.errorMessage != null) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(viewModel.errorMessage!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, fontSize: 16),),
+                              const SizedBox(height: 12,),
+                              CustomElevatedButton(title: Text("Try Again"), onPressed: (){viewModel.searchMovies(_searchController.text);}, backgroundColor: ColorsManager.yellow)
+                            ],
+                          ),
+                        );
+                      }
+                      if(viewModel.movies.isEmpty){
+                        return Center(
+                          child: Text(
+                            l10n.noMoviesFound,
+                            style: TextStyle(color: Colors.white70, fontSize: 16),
+                          ),
+                        );
+                      }
+                      bool isLoading = viewModel.isLoading;
+                      List<Movies> movies = viewModel.movies.isNotEmpty
+                          ? viewModel.movies
+                          : List.generate(10, (index) => Movies(title: "Loading Movie", rating: 0.0, year: 2024, mediumCoverImage: ""));
+                      return Skeletonizer(
+                        enabled: isLoading,
+                        child: GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.65, crossAxisSpacing: 12, mainAxisSpacing: 12,),
+                          itemCount: movies.length,
                           itemBuilder: (context, index) {
-                            return MovieItem(movie: searchResults[index]);
+                            return MovieItem(movie: movies[index]);
                           },
                         ),
+                      );
+                    }
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
