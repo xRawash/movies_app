@@ -9,7 +9,7 @@ import 'package:movies_app/api/movie_response/movies_response.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
 
 class ApiServices {
-  static const String _authority = "movies-api.accel.li";
+  static const String _authority = "yts.am";
   static const String _moviesEndPoint = "/api/v2/list_movies.json";
   static const String _movieDetailsEndPoint = "/api/v2/movie_details.json";
   static const String _movieSuggestions = "/api/v2/movie_suggestions.json";
