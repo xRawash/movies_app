@@ -21,6 +21,7 @@ class HomeViewModel extends ChangeNotifier {
 
       if(response.status != 'ok' || response.data?.movies == null) {
         Utilities.showToast(response.statusMessage ?? "Failed to load movies");
+        return;
       }
       movies = response.data!.movies!.take(15).toList();
     } catch(e) {

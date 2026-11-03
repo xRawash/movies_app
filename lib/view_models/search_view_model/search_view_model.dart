@@ -40,7 +40,7 @@ class SearchViewModel extends ChangeNotifier{
     errorMessage = null;
     notifyListeners();
     try{
-      final response = await _movieRepo.getSearchResults(query);
+      final response = await _movieRepo.getSearchResults(searchQuery);
 
       if(currentRequestId != _requestId){
         return;
