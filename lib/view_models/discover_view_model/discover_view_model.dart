@@ -29,7 +29,7 @@ class DiscoverViewModel extends ChangeNotifier {
       if (response.status != 'ok' || response.data?.movies == null) {
         errorMessage = response.statusMessage ?? 'Failed to load movies';
       } else {
-        movies = response.data!.movies!.take(6).toList();
+        movies = response.data!.movies!;
       }
     } catch (e) {
       if (currentRequestId != _requestId) return;
