@@ -335,7 +335,7 @@ class FirebaseServices {
         .any((item) => item['id'] == movie.id);
     if (!exists) {
       UserModel.loggedInUser!.wishListMovies!.add(movie.toJson());
-      userDocument.update(UserModel.loggedInUser!.toJson());
+      await userDocument.update(UserModel.loggedInUser!.toJson());
     }
   }
 
@@ -361,7 +361,7 @@ class FirebaseServices {
     );
     UserModel.loggedInUser!.wishListMovies!
         .removeWhere((item) => item['id'] == movie.id);
-    userDocument.update(UserModel.loggedInUser!.toJson());
+    await userDocument.update(UserModel.loggedInUser!.toJson());
   }
 
   static Future<void> resetPassword(String email, BuildContext context) async {

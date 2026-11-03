@@ -20,7 +20,7 @@ class GenreViewModel extends ChangeNotifier {
       if (response.status != 'ok' || response.data?.movies == null) {
         errorMessage = response.statusMessage;
       } else {
-        movies = response.data!.movies!.take(6).toList();
+        movies = response.data!.movies!;
       }
     } catch (e) {
       errorMessage = e.toString();

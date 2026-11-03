@@ -11,6 +11,8 @@ import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/prefs_manager/prefs_manager.dart';
 import 'package:movies_app/provider/config_provider.dart';
+import 'package:movies_app/repos/bookmark_repo/bookmark_repo.dart';
+import 'package:movies_app/view_models/bookmark_view_model/bookmark_view_model.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -31,8 +33,11 @@ void main() async {
   }
   await LibtorrentFlutter.init();
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ConfigProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ConfigProvider()),
+        ChangeNotifierProvider(create: (context) => BookmarkViewModel(bookmarkRepo: BookmarkRepo())),
+      ],
       child: const MoviesApp(),
     ),
   );
@@ -54,9 +59,7 @@ class MoviesApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: Locale(
-        configProvider.currentLanguage == 'en' ? 'en' : 'ar'
-      ),
+      locale: Locale(configProvider.currentLanguage == 'en' ? 'en' : 'ar'),
       initialRoute: !isFinishedOnboarding
           ? RoutesManager.onboarding
           : UserModel.loggedInUser != null

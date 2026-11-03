@@ -96,7 +96,7 @@ class _GenreSectionState extends State<GenreSection> {
                 }
                 bool isLoading = viewModel.isLoading;
                 final List<Movies> movies = viewModel.movies.isNotEmpty
-                    ? viewModel.movies
+                    ? viewModel.movies.take(6).toList()
                     : List.generate(
                         6,
                         (index) => Movies(

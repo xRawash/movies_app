@@ -11,8 +11,9 @@ class MovieItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, RoutesManager.movieDetails, arguments: movie);
+      onTap: ()  async {
+         await Navigator.pushNamed(context, RoutesManager.movieDetails, arguments: movie);
+         onNavigateBack?.call();
       },
       child: AspectRatio(
         aspectRatio: 2 / 3,
