@@ -19,6 +19,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
+      extendBodyBehindAppBar: true,
       body: tabs[selectedTab],
       bottomNavigationBar: _buildBottomNavigationBar,
     );

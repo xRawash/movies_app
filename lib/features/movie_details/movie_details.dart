@@ -5,10 +5,12 @@ import 'package:movies_app/api/movie_detailed_response/movie_detailed_response.d
 import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
+import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 import 'package:movies_app/features/main_layout/widgets/custom_card.dart';
 import 'package:movies_app/features/movie_details/widgets/movie_bookmark.dart';
 import 'package:movies_app/features/movie_details/widgets/resolution_dialog.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
+import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class MovieDetails extends StatefulWidget {
@@ -37,6 +39,8 @@ class _MovieDetailsState extends State<MovieDetails> {
       return const Scaffold(body: SizedBox.shrink());
     }
 
+    var l10n = AppLocalizations.of(context)!;
+
     return FutureBuilder<MovieDetailedResponse>(
       future: _movieDetailsFuture,
       builder: (context, snapshot) {
@@ -45,7 +49,7 @@ class _MovieDetailsState extends State<MovieDetails> {
           debugPrint(snapshot.error.toString());
           return Scaffold(
             appBar: AppBar(backgroundColor: Colors.transparent),
-            body: Center(child: Text("Error loading details", style: TextStyle(color: Colors.white))),
+            body: Center(child: Text(l10n.errorLoading, style: TextStyle(color: Colors.white))),
           );
         }
 
@@ -125,7 +129,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                       children: [
                         CustomElevatedButton(
                           title: Text(
-                            "Watch",
+                            l10n.watch,
                             style: Theme.of(context).textTheme.headlineLarge,
                           ),
                           onPressed: () {
@@ -210,7 +214,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                           ],
                         ),
                         Text(
-                          "Screen Shots",
+                          l10n.screenshots,
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
                         ListView.separated(
@@ -232,7 +236,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                               : 2,
                         ),
                         Text(
-                          "Similar",
+                          l10n.similar,
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
                         GridView.builder(
@@ -250,14 +254,14 @@ class _MovieDetailsState extends State<MovieDetails> {
                           itemCount: detailedMovie.similarMovies.length,
                         ),
                         Text(
-                          "Summary",
+                          l10n.summary,
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
                         Text(
                           detailedMovie.descriptionFull ?? "",
                           style: Theme.of(context).textTheme.displaySmall,
                         ),
-                        Text("Cast", style: Theme.of(context).textTheme.labelMedium),
+                        Text(l10n.cast, style: Theme.of(context).textTheme.labelMedium),
                         ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -325,7 +329,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                               : 3,
                         ),
                         Text(
-                          "Genres",
+                          l10n.genres,
                           style: Theme.of(context).textTheme.labelMedium,
                         ),
                         Wrap(
@@ -341,7 +345,7 @@ class _MovieDetailsState extends State<MovieDetails> {
                                     vertical: 8,
                                   ),
                                   child: Text(
-                                    genre,
+                                    GenresIds.getLocalizedGenre(context, genre),
                                     style: Theme.of(context).textTheme.displaySmall,
                                   ),
                                 ),

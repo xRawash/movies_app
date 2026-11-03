@@ -17,7 +17,7 @@ class _LangSwitchState extends State<LangSwitch> {
   @override
   Widget build(BuildContext context) {
     ConfigProvider configProvider = Provider.of<ConfigProvider>(context);
-    isArabic = configProvider.language == 'ar';
+    isArabic = configProvider.currentLanguage == 'ar';
     return AnimatedToggleSwitch<bool>.size(
       current: isArabic,
       values: const [false, true],

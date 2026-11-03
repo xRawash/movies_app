@@ -260,6 +260,300 @@ abstract class AppLocalizations {
   /// **'Choose a resolution'**
   String get chooseResolution;
 
+  /// No description provided for @errorLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading details'**
+  String get errorLoading;
+
+  /// No description provided for @failedToLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load movie details'**
+  String get failedToLoad;
+
+  /// No description provided for @noTorrentsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No torrents available'**
+  String get noTorrentsAvailable;
+
+  /// No description provided for @noMoviesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No movies found'**
+  String get noMoviesFound;
+
+  /// No description provided for @searchForFavoriteMovies.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for your favorite movies'**
+  String get searchForFavoriteMovies;
+
+  /// No description provided for @goBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Back'**
+  String get goBack;
+
+  /// No description provided for @torrentProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Torrent Progress'**
+  String get torrentProgress;
+
+  /// No description provided for @bufferedAhead.
+  ///
+  /// In en, this message translates to:
+  /// **'Buffered ahead'**
+  String get bufferedAhead;
+
+  /// No description provided for @invalidPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Phone Number'**
+  String get invalidPhoneNumber;
+
+  /// No description provided for @failedToLoadTorrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load torrent'**
+  String get failedToLoadTorrent;
+
+  /// No description provided for @failedToStreamMedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to stream media'**
+  String get failedToStreamMedia;
+
+  /// No description provided for @playbackFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Playback failed. Unsupported format.'**
+  String get playbackFailed;
+
+  /// No description provided for @movieAddedToWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Movie added to wishlist'**
+  String get movieAddedToWishlist;
+
+  /// No description provided for @movieRemovedFromWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Movie removed from wishlist'**
+  String get movieRemovedFromWishlist;
+
+  /// No description provided for @passwordResetEmailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset email sent'**
+  String get passwordResetEmailSent;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @exit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get exit;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @dontHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t Have Account?'**
+  String get dontHaveAccount;
+
+  /// No description provided for @createOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Create One'**
+  String get createOne;
+
+  /// No description provided for @loginWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Login With Google'**
+  String get loginWithGoogle;
+
+  /// No description provided for @accountCreatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Created Successfully'**
+  String get accountCreatedSuccessfully;
+
+  /// No description provided for @emailAlreadyInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Email already used'**
+  String get emailAlreadyInUse;
+
+  /// No description provided for @weakPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is too weak'**
+  String get weakPassword;
+
+  /// No description provided for @invalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email address'**
+  String get invalidEmail;
+
+  /// No description provided for @networkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error. Check your connection.'**
+  String get networkError;
+
+  /// No description provided for @signUpFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up failed. Please try again.'**
+  String get signUpFailed;
+
+  /// No description provided for @somethingWentWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get somethingWentWrong;
+
+  /// No description provided for @noProfileFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No profile found for this account.'**
+  String get noProfileFound;
+
+  /// No description provided for @loggedInSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged In Successfully'**
+  String get loggedInSuccessfully;
+
+  /// No description provided for @wrongEmailOrPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong email or password.'**
+  String get wrongEmailOrPassword;
+
+  /// No description provided for @accountDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'This account has been disabled.'**
+  String get accountDisabled;
+
+  /// No description provided for @tooManyAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Try again later.'**
+  String get tooManyAttempts;
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed. Please try again.'**
+  String get loginFailed;
+
+  /// No description provided for @couldNotLoadProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load your profile. Please try again.'**
+  String get couldNotLoadProfile;
+
+  /// No description provided for @noAccountFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No account found. Please sign up first.'**
+  String get noAccountFound;
+
+  /// No description provided for @signInCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in cancelled'**
+  String get signInCancelled;
+
+  /// No description provided for @googleSignInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in failed. Please try again.'**
+  String get googleSignInFailed;
+
+  /// No description provided for @accountExistsDifferentCredential.
+  ///
+  /// In en, this message translates to:
+  /// **'An account already exists with a different sign-in method.'**
+  String get accountExistsDifferentCredential;
+
+  /// No description provided for @invalidGoogleCredential.
+  ///
+  /// In en, this message translates to:
+  /// **'The Google credential is invalid or expired.'**
+  String get invalidGoogleCredential;
+
+  /// No description provided for @welcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back!'**
+  String get welcomeBack;
+
+  /// No description provided for @signUpCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-up cancelled'**
+  String get signUpCancelled;
+
+  /// No description provided for @loggedOutSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged Out Successfully'**
+  String get loggedOutSuccessfully;
+
+  /// No description provided for @signOutFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-out failed. Please try again.'**
+  String get signOutFailed;
+
+  /// No description provided for @accountDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Deleted Successfully'**
+  String get accountDeletedSuccessfully;
+
+  /// No description provided for @accountDeletionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deletion failed. Please try again.'**
+  String get accountDeletionFailed;
+
+  /// No description provided for @profileUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Updated Successfully'**
+  String get profileUpdatedSuccessfully;
+
+  /// No description provided for @noUserFoundWithEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'No user found with this email'**
+  String get noUserFoundWithEmail;
+
+  /// No description provided for @passwordResetFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset failed. Please try again.'**
+  String get passwordResetFailed;
+
   /// No description provided for @genreAction.
   ///
   /// In en, this message translates to:

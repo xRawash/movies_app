@@ -238,7 +238,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 onPressed: () {
                   final phoneStr = _phoneNumberController.value.international;
                   if (phoneStr.isEmpty) {
-                    Utilities.showToast('Invalid Phone Number');
+                    Utilities.showToast(l10n.invalidPhoneNumber);
                     return;
                   }
                   FirebaseServices.signUpWithGoogle(phoneStr, context);

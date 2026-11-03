@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
+import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/models/user_model.dart';
 
 import '../core/sources/routes_manager.dart';
@@ -14,6 +15,7 @@ class FirebaseServices {
     FirebaseFirestore db = FirebaseFirestore.instance;
     return db.collection('users');
   }
+
   static Future<void> addUserToFirestore(UserModel user) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
@@ -22,6 +24,7 @@ class FirebaseServices {
     );
     return userDocument.set(user.toJson());
   }
+
   static Future<UserModel?> getCurrentUser(String userId) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
@@ -32,8 +35,18 @@ class FirebaseServices {
     Map<String, dynamic>? data = snapshot.data();
     return data == null ? null : UserModel.fromJson(data);
   }
-  static void register(String name, String email, String password, String phoneNumber, BuildContext context, String avatarName, GlobalKey<FormState> key,) async {
+
+  static void register(
+    String name,
+    String email,
+    String password,
+    String phoneNumber,
+    BuildContext context,
+    String avatarName,
+    GlobalKey<FormState> key,
+  ) async {
     if (key.currentState!.validate() == false) return;
+    var l10n = AppLocalizations.of(context)!;
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -48,74 +61,83 @@ class FirebaseServices {
       if (!context.mounted) {
         return null;
       }
-      Utilities.showToast('Account Created Successfully');
+      Utilities.showToast(l10n.accountCreatedSuccessfully);
       Navigator.pushReplacementNamed(context, RoutesManager.login);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':
-          Utilities.showToast('Email already used');
+          Utilities.showToast(l10n.emailAlreadyInUse);
           break;
         case 'weak-password':
-          Utilities.showToast('Password is too weak');
+          Utilities.showToast(l10n.weakPassword);
           break;
         case 'invalid-email':
-          Utilities.showToast('Invalid email address');
+          Utilities.showToast(l10n.invalidEmail);
           break;
         case 'network-request-failed':
-          Utilities.showToast('Network error. Check your connection.');
+          Utilities.showToast(l10n.networkError);
           break;
         default:
-          Utilities.showToast('Sign up failed. Please try again.');
+          Utilities.showToast(l10n.signUpFailed);
       }
     } on FirebaseException {
-      Utilities.showToast('Sign up failed. Please try again.');
+      Utilities.showToast(l10n.signUpFailed);
     } catch (e) {
-      Utilities.showToast('Something went wrong. Please try again.');
+      Utilities.showToast(l10n.somethingWentWrong);
     }
   }
-  static void login(String email, String password, BuildContext context, GlobalKey<FormState> key,) async {
+
+  static void login(
+    String email,
+    String password,
+    BuildContext context,
+    GlobalKey<FormState> key,
+  ) async {
     if (key.currentState!.validate() == false) return;
+    var l10n = AppLocalizations.of(context)!;
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
       final user = await getCurrentUser(userCredential.user!.uid);
       if (user == null) {
         await FirebaseAuth.instance.signOut();
-        Utilities.showToast('No profile found for this account.');
+        Utilities.showToast(l10n.noProfileFound);
         return;
       }
       UserModel.loggedInUser = user;
       if (!context.mounted) {
         return null;
       }
-      Utilities.showToast('Logged In Successfully');
+      Utilities.showToast(l10n.loggedInSuccessfully);
       Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'invalid-credential':
         case 'user-not-found':
         case 'wrong-password':
-          Utilities.showToast('Wrong email or password.');
+          Utilities.showToast(l10n.wrongEmailOrPassword);
           break;
         case 'user-disabled':
-          Utilities.showToast('This account has been disabled.');
+          Utilities.showToast(l10n.accountDisabled);
           break;
         case 'too-many-requests':
-          Utilities.showToast('Too many attempts. Try again later.');
+          Utilities.showToast(l10n.tooManyAttempts);
           break;
         case 'network-request-failed':
-          Utilities.showToast('Network error. Check your connection.');
+          Utilities.showToast(l10n.networkError);
           break;
         default:
-          Utilities.showToast('Login failed. Please try again.');
+          Utilities.showToast(l10n.loginFailed);
       }
     } on FirebaseException {
-      Utilities.showToast('Could not load your profile. Please try again.');
+      Utilities.showToast(l10n.couldNotLoadProfile);
     } catch (e) {
-      Utilities.showToast('Something went wrong. Please try again.');
+      Utilities.showToast(l10n.somethingWentWrong);
     }
   }
+
   static Future<UserCredential?> loginWithGoogle(BuildContext context) async {
+    var l10n = AppLocalizations.of(context)!;
     try {
       GoogleSignInAccount googleUser = await GoogleSignIn.instance
           .authenticate();
@@ -129,49 +151,52 @@ class FirebaseServices {
       if (user == null) {
         await FirebaseAuth.instance.signOut();
         await GoogleSignIn.instance.signOut();
-        Utilities.showToast('No account found. Please sign up first.');
+        Utilities.showToast(l10n.noAccountFound);
         return null;
       }
       UserModel.loggedInUser = user;
       if (!context.mounted) return userCredential;
-      Utilities.showToast('Logged In Successfully');
+      Utilities.showToast(l10n.loggedInSuccessfully);
       Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
       return userCredential;
     } on GoogleSignInException catch (e) {
       switch (e.code) {
         case GoogleSignInExceptionCode.canceled:
-          Utilities.showToast('Sign-in cancelled');
+          Utilities.showToast(l10n.signInCancelled);
           break;
         default:
-          Utilities.showToast('Google sign-in failed. Please try again.');
+          Utilities.showToast(l10n.googleSignInFailed);
       }
       return null;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          Utilities.showToast(
-            'An account already exists with a different sign-in method.',
-          );
+          Utilities.showToast(l10n.accountExistsDifferentCredential);
           break;
         case 'invalid-credential':
-          Utilities.showToast('The Google credential is invalid or expired.');
+          Utilities.showToast(l10n.invalidGoogleCredential);
           break;
         case 'user-disabled':
-          Utilities.showToast('This account has been disabled.');
+          Utilities.showToast(l10n.accountDisabled);
           break;
         case 'network-request-failed':
-          Utilities.showToast('Network error. Check your connection.');
+          Utilities.showToast(l10n.networkError);
           break;
         default:
-          Utilities.showToast('Sign-in failed. Please try again.');
+          Utilities.showToast(l10n.signInCancelled);
       }
       return null;
     } catch (e) {
-      Utilities.showToast('Sign-in failed. Please try again.');
+      Utilities.showToast(l10n.googleSignInFailed);
       return null;
     }
   }
-  static Future<UserCredential?> signUpWithGoogle(String phoneNumber, BuildContext context,) async {
+
+  static Future<UserCredential?> signUpWithGoogle(
+    String phoneNumber,
+    BuildContext context,
+  ) async {
+    var l10n = AppLocalizations.of(context)!;
     try {
       GoogleSignInAccount googleUser = await GoogleSignIn.instance
           .authenticate();
@@ -195,12 +220,12 @@ class FirebaseServices {
         await addUserToFirestore(user);
         UserModel.loggedInUser = user;
         if (!context.mounted) return userCredential;
-        Utilities.showToast('Account Created Successfully');
+        Utilities.showToast(l10n.accountCreatedSuccessfully);
         Navigator.pushReplacementNamed(context, RoutesManager.login);
       } else {
         UserModel.loggedInUser = existing;
         if (!context.mounted) return userCredential;
-        Utilities.showToast('Welcome Back!');
+        Utilities.showToast(l10n.welcomeBack);
         Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
       }
       return userCredential;
@@ -208,57 +233,59 @@ class FirebaseServices {
       debugPrint('GoogleSignInException: ${e.code} | ${e.description}');
       switch (e.code) {
         case GoogleSignInExceptionCode.canceled:
-          Utilities.showToast('Sign-up cancelled');
+          Utilities.showToast(l10n.signUpCancelled);
           break;
         default:
-          Utilities.showToast('Google sign-up failed: ${e.code.name}');
+          Utilities.showToast(l10n.googleSignInFailed);
       }
       return null;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          Utilities.showToast(
-            'An account already exists with a different sign-in method.',
-          );
+          Utilities.showToast(l10n.accountExistsDifferentCredential);
           break;
         case 'invalid-credential':
-          Utilities.showToast('The Google credential is invalid or expired.');
+          Utilities.showToast(l10n.invalidGoogleCredential);
           break;
         case 'user-disabled':
-          Utilities.showToast('This account has been disabled.');
+          Utilities.showToast(l10n.accountDisabled);
           break;
         case 'network-request-failed':
-          Utilities.showToast('Network error. Check your connection.');
+          Utilities.showToast(l10n.networkError);
           break;
         default:
-          Utilities.showToast('Sign-in failed. Please try again.');
+          Utilities.showToast(l10n.googleSignInFailed);
       }
       return null;
     } catch (e) {
-      Utilities.showToast('Something went wrong. Please try again.');
+      Utilities.showToast(l10n.somethingWentWrong);
       return null;
     }
   }
+
   static Future<void> signOut(BuildContext context) async {
+    var l10n = AppLocalizations.of(context)!;
     try {
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn.instance.signOut();
       if (!context.mounted) return;
-      Utilities.showToast('Logged Out Successfully');
+      Utilities.showToast(l10n.loggedOutSuccessfully);
       Navigator.pushReplacementNamed(context, RoutesManager.login);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'network-request-failed':
-          Utilities.showToast('Network error. Check your connection.');
+          Utilities.showToast(l10n.networkError);
           break;
         default:
-          Utilities.showToast('Sign-out failed. Please try again.');
+          Utilities.showToast(l10n.signOutFailed);
       }
     } catch (e) {
-      Utilities.showToast('Sign-out failed. Please try again.');
+      Utilities.showToast(l10n.signOutFailed);
     }
   }
+
   static Future<void> deleteAccount(BuildContext context) async {
+    var l10n = AppLocalizations.of(context)!;
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
@@ -270,34 +297,37 @@ class FirebaseServices {
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn.instance.signOut();
       if (!context.mounted) return;
-      Utilities.showToast('Account Deleted Successfully');
+      Utilities.showToast(l10n.accountDeletedSuccessfully);
       Navigator.pushReplacementNamed(context, RoutesManager.login);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'network-request-failed':
-          Utilities.showToast('Network error. Check your connection.');
+          Utilities.showToast(l10n.networkError);
           break;
         default:
-          Utilities.showToast('Account deletion failed. Please try again.');
+          Utilities.showToast(l10n.accountDeletionFailed);
       }
     } catch (e) {
-      Utilities.showToast('Account deletion failed. Please try again.');
+      Utilities.showToast(l10n.accountDeletionFailed);
     }
   }
+
   static Future<void> updateProfile(BuildContext context) async {
+    var l10n = AppLocalizations.of(context)!;
     CollectionReference<Map<String, dynamic>> usersCollection =
-    _getUsersCollectionReference();
+        _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
     userDocument.update(UserModel.loggedInUser!.toJson());
     if (!context.mounted) return;
-    Utilities.showToast('Profile Updated Successfully');
+    Utilities.showToast(l10n.profileUpdatedSuccessfully);
     Navigator.pop(context);
   }
+
   static Future<void> addMovieToWishList(Movie movie) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
-    _getUsersCollectionReference();
+        _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
@@ -307,50 +337,56 @@ class FirebaseServices {
       UserModel.loggedInUser!.wishListMovies!.add(movie.toJson());
       userDocument.update(UserModel.loggedInUser!.toJson());
     }
-    Utilities.showToast('Movie added to wishlist');
   }
-  static Future<void> addMovieToHistory (Movie movie) async {
-    CollectionReference<Map<String, dynamic>> usersCollection = _getUsersCollectionReference();
-    DocumentReference<Map<String, dynamic>> userDox = usersCollection.doc(UserModel.loggedInUser!.id);
-    bool exists = UserModel.loggedInUser!.watchedMovies!.any((item) => item['id'] == movie.id);
-    if(!exists){
+
+  static Future<void> addMovieToHistory(Movie movie) async {
+    CollectionReference<Map<String, dynamic>> usersCollection =
+        _getUsersCollectionReference();
+    DocumentReference<Map<String, dynamic>> userDox = usersCollection.doc(
+      UserModel.loggedInUser!.id,
+    );
+    bool exists = UserModel.loggedInUser!.watchedMovies!
+        .any((item) => item['id'] == movie.id);
+    if (!exists) {
       UserModel.loggedInUser!.watchedMovies!.add(movie.toJson());
       userDox.update(UserModel.loggedInUser!.toJson());
     }
   }
+
   static Future<void> removeMovieFromWishList(Movie movie) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
-    _getUsersCollectionReference();
+        _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
     UserModel.loggedInUser!.wishListMovies!
         .removeWhere((item) => item['id'] == movie.id);
     userDocument.update(UserModel.loggedInUser!.toJson());
-    Utilities.showToast('Movie removed from wishlist');
   }
+
   static Future<void> resetPassword(String email, BuildContext context) async {
+    var l10n = AppLocalizations.of(context)!;
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       if (!context.mounted) return;
-      Utilities.showToast('Password reset email sent');
+      Utilities.showToast(l10n.passwordResetEmailSent);
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'invalid-email':
-          Utilities.showToast('Invalid email address');
+          Utilities.showToast(l10n.invalidEmail);
           break;
         case 'user-not-found':
-          Utilities.showToast('No user found with this email');
+          Utilities.showToast(l10n.noUserFoundWithEmail);
           break;
         case 'network-request-failed':
-          Utilities.showToast('Network error. Check your connection.');
+          Utilities.showToast(l10n.networkError);
           break;
         default:
-          Utilities.showToast('Password reset failed. Please try again.');
+          Utilities.showToast(l10n.passwordResetFailed);
       }
     } catch (e) {
-      Utilities.showToast('Password reset failed. Please try again.');
+      Utilities.showToast(l10n.passwordResetFailed);
     }
   }
 }

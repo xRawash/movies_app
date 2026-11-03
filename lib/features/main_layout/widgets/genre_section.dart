@@ -4,7 +4,11 @@ import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/api/movie_response/movies_response.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
+import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
+import 'package:movies_app/l10n/app_localizations.dart';
+import 'package:movies_app/provider/config_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class GenreSection extends StatefulWidget {
@@ -27,7 +31,8 @@ class _GenreSectionState extends State<GenreSection> {
 
   @override
   Widget build(BuildContext context) {
-    String title = widget.genre[0].toUpperCase() + widget.genre.substring(1);
+    String title = GenresIds.getLocalizedGenre(context, widget.genre);
+    ConfigProvider configProvider = Provider.of<ConfigProvider>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -49,7 +54,8 @@ class _GenreSectionState extends State<GenreSection> {
                   Navigator.pushNamed(context, RoutesManager.moviesByGenre, arguments: {'genreId': widget.genre});
                 },
                 child: Text(
-                  "See More  →",
+                  configProvider.currentLanguage == 'en' ?
+                  "${AppLocalizations.of(context)!.seeMore}  →" : "${AppLocalizations.of(context)!.seeMore}  ←" ,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: ColorsManager.yellow,
                         fontSize: 14,

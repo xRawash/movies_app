@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
+import 'package:movies_app/l10n/app_localizations.dart';
 
 void showResolutionDialog(BuildContext context, Movie movie) {
+  var l10n = AppLocalizations.of(context)!;
   String torrentId_720p = "";
   String torrentId_1080p = "";
   String magnetLink_720p = "";
@@ -46,7 +48,7 @@ void showResolutionDialog(BuildContext context, Movie movie) {
       return AlertDialog(
         backgroundColor: ColorsManager.darkGrey,
         title: Text(
-          "Choose a resolution",
+          l10n.chooseResolution,
           style: TextStyle(color: Colors.white),
         ),
         content: Column(
@@ -90,7 +92,7 @@ void showResolutionDialog(BuildContext context, Movie movie) {
               ),
             if (magnetLink_720p.isEmpty && magnetLink_1080p.isEmpty)
               Text(
-                "No torrents available",
+                l10n.noTorrentsAvailable,
                 style: TextStyle(color: Colors.white70),
               ),
           ],

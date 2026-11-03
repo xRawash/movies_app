@@ -4,8 +4,10 @@ import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
+import 'package:movies_app/core/widgets/lang_switch.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
+import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/models/user_model.dart';
 
 class ProfileTab extends StatefulWidget {
@@ -28,6 +30,7 @@ class _ProfileTabState extends State<ProfileTab> {
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context)!;
     currentUser = UserModel.loggedInUser!;
     List<Map<String, dynamic>> movies = selectedTab == 0
         ? (currentUser.wishListMovies ?? [])
@@ -75,7 +78,7 @@ class _ProfileTabState extends State<ProfileTab> {
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "Wish List",
+                              l10n.wishList,
                               style: Theme.of(context).textTheme.labelMedium,
                             ),
                           ],
@@ -90,7 +93,7 @@ class _ProfileTabState extends State<ProfileTab> {
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "History",
+                              l10n.history,
                               style: Theme.of(context).textTheme.labelMedium,
                             ),
                           ],
@@ -105,7 +108,7 @@ class _ProfileTabState extends State<ProfileTab> {
                         flex: 2,
                         child: CustomElevatedButton(
                           title: Text(
-                            "Edit Profile",
+                            l10n.editProfile,
                             style: Theme.of(context).textTheme.titleMedium!
                                 .copyWith(fontWeight: FontWeight.normal),
                           ),
@@ -129,9 +132,13 @@ class _ProfileTabState extends State<ProfileTab> {
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Text(
-                                "Exit",
-                                style: Theme.of(context).textTheme.bodyMedium,
+                              Expanded(
+                                child: Text(
+                                  l10n.exit,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
                               ),
                               Icon(Icons.logout, color: Colors.white),
                             ],
@@ -162,11 +169,11 @@ class _ProfileTabState extends State<ProfileTab> {
                       indicatorColor: ColorsManager.yellow,
                       tabs: [
                         Tab(
-                          text: "Wish List",
+                          text: l10n.wishList,
                           icon: Icon(Icons.list, color: ColorsManager.yellow),
                         ),
                         Tab(
-                          text: "History",
+                          text: l10n.history,
                           icon: Icon(Icons.folder, color: ColorsManager.yellow),
                         ),
                       ],

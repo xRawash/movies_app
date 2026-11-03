@@ -4,6 +4,7 @@ import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
+import 'package:movies_app/l10n/app_localizations.dart';
 
 class SearchTab extends StatefulWidget {
   const SearchTab({super.key});
@@ -25,7 +26,6 @@ class _SearchTabState extends State<SearchTab> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -59,6 +59,7 @@ class _SearchTabState extends State<SearchTab> {
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -66,7 +67,7 @@ class _SearchTabState extends State<SearchTab> {
           children: [
             CustomTextField(
               controller: _searchController,
-              hint: 'Search movies...',
+              hint: l10n.search,
               prefixIcon: Icon(Icons.search),
               onChanged: (value) {
                 _searchMovies(value ?? '');
@@ -85,8 +86,8 @@ class _SearchTabState extends State<SearchTab> {
                       ? Center(
                           child: Text(
                             _searchController.text.isEmpty
-                                ? "Search for your favorite movies"
-                                : "No movies found",
+                                ? l10n.searchForFavoriteMovies
+                                : l10n.noMoviesFound,
                             style: TextStyle(color: Colors.white70, fontSize: 16),
                           ),
                         )
@@ -106,7 +107,6 @@ class _SearchTabState extends State<SearchTab> {
           ],
         ),
       ),
-      
     );
   }
 }

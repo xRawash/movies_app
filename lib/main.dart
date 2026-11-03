@@ -55,7 +55,7 @@ class MoviesApp extends StatelessWidget {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       locale: Locale(
-        configProvider.language == 'en' ? 'en' : 'ar'
+        configProvider.currentLanguage == 'en' ? 'en' : 'ar'
       ),
       initialRoute: !isFinishedOnboarding
           ? RoutesManager.onboarding

@@ -6,7 +6,9 @@ import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/core/widgets/custom_phone_field.dart';
 import 'package:movies_app/core/widgets/custom_text_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
+import 'package:movies_app/core/widgets/lang_switch.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
+import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/models/user_model.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 
@@ -23,6 +25,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   late TextEditingController _nameController;
   late PhoneController _phoneController;
   PhoneNumber? initialPhone;
+
   @override
   void initState() {
     super.initState();
@@ -47,9 +50,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context)!;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(title: Text("Update Profile"), centerTitle: true),
+      appBar: AppBar(title: Text(l10n.updateProfile), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -125,14 +129,29 @@ class _UpdateProfileState extends State<UpdateProfile> {
             SizedBox(height: 20),
             CustomPhoneField(
               controller: _phoneController,
-              hint: "Enter your phone number",
+              hint: l10n.phone,
             ),
             SizedBox(height: 20),
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: ColorsManager.darkGrey,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Text(l10n.language, style: Theme.of(context).textTheme.labelMedium,),
+                  Spacer(),
+                  LangSwitch(),
+                ],
+              ),
+            ),
+            SizedBox(height: 15,),
             Align(
               alignment: AlignmentGeometry.centerLeft,
               child: CustomTextButton(
                 title: Text(
-                  "Reset Password",
+                  l10n.resetPassword,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 onPressed: () {
@@ -143,7 +162,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
             Spacer(),
             CustomElevatedButton(
               title: Text(
-                "Delete Account",
+                l10n.deleteAccount,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               onPressed: () async {
@@ -154,7 +173,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
             SizedBox(height: 19),
             CustomElevatedButton(
               title: Text(
-                "Update Account",
+                l10n.updateAccount,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               onPressed: () async {

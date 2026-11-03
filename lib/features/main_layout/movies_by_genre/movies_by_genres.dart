@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/api/api_services.dart';
 import 'package:movies_app/api/movie_response/movies.dart';
+import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -14,7 +15,7 @@ class MoviesByGenres extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(genreId.toUpperCase()),
+        title: Text(GenresIds.getLocalizedGenre(context, genreId)),
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);

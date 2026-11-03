@@ -8,6 +8,7 @@ import 'package:movies_app/core/widgets/custom_text_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/core/widgets/lang_switch.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
+import 'package:movies_app/l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -39,6 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context)!;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       extendBody: true,
@@ -54,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 CustomTextField(
                   controller: _emailController,
                   validation: Validations.validateEmail,
-                  hint: "Email",
+                  hint: l10n.email,
                   prefixIcon: Icon(Icons.email),
                 ),
                 SizedBox(height: 23),
@@ -62,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   validation: Validations.validatePassword,
                   obscureText: isObscured,
-                  hint: "Password",
+                  hint: l10n.password,
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
                     onPressed: () {
@@ -83,14 +85,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.pushNamed(context, RoutesManager.forgetPassword);
                     },
                     title: Text(
-                      "Forget Password ?",
+                      l10n.forgetPassword,
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                   ),
                 ),
                 CustomElevatedButton(
                   title: Text(
-                    "Login",
+                    l10n.login,
                     style: Theme.of(context).textTheme.titleMedium!
                         .copyWith(fontWeight: FontWeight.normal),
                   ),
@@ -103,13 +105,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Don't Have Account ?"),
+                    Text(l10n.dontHaveAccount),
                     CustomTextButton(
                       onPressed: () {
                         Navigator.pushNamed(context, RoutesManager.register);
                       },
                       title: Text(
-                        "Create One",
+                        l10n.createOne,
                         style: Theme.of(context).textTheme.labelSmall!
                             .copyWith(fontWeight: FontWeight.bold),
                       ),
@@ -155,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(width: 8),
                       Text(
-                        "Login With Google",
+                        l10n.loginWithGoogle,
                         style: Theme.of(context).textTheme.titleMedium!
                             .copyWith(fontWeight: FontWeight.normal),
                       ),
