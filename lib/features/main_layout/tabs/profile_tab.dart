@@ -4,7 +4,6 @@ import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
-import 'package:movies_app/core/widgets/lang_switch.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/l10n/app_localizations.dart';

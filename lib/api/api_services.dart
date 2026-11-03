@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:movies_app/api/movie_detailed_response/movie_detailed_response.dart';
 import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/api/movie_response/movies_response.dart';
+import 'package:movies_app/core/utilities/utilities.dart';
 
 class ApiServices {
   static const String _authority = "movies-api.accel.li";
@@ -11,36 +14,64 @@ class ApiServices {
   static const String _movieDetailsEndPoint = "/api/v2/movie_details.json";
   static const String _movieSuggestions = "/api/v2/movie_suggestions.json";
 
+  static Future<Map<String, dynamic>?> _getServerResponse(Uri url) async {
+    try {
+      final serverResponse = await http.get(url).timeout(const Duration(seconds: 25));
+      if (serverResponse.statusCode == 200) {
+        return jsonDecode(serverResponse.body) as Map<String, dynamic>;
+      } else {
+        Utilities.showToast("Server error (${serverResponse.statusCode})");
+        return null;
+      }
+    } on SocketException {
+      Utilities.showToast("No internet connection");
+      return null;
+    } on TimeoutException {
+      Utilities.showToast("Request timed out");
+      return null;
+    } on FormatException {
+      Utilities.showToast("Invalid response format");
+      return null;
+    } catch (e) {
+      Utilities.showToast("An unexpected error occurred");
+      return null;
+    }
+  }
+
   static Future<MoviesResponse> getMovieResponse() async {
     Uri url = Uri.https(_authority, _moviesEndPoint);
-    http.Response serverResponse = await http.get(url);
-    Map<String, dynamic> json = jsonDecode(serverResponse.body);
-    MoviesResponse movieResponse = MoviesResponse.fromJson(json);
-    return movieResponse;
+    final json = await _getServerResponse(url);
+    if (json != null) {
+      return MoviesResponse.fromJson(json);
+    }
+    return MoviesResponse(status: 'error', statusMessage: 'Failed to load movies');
   }
 
   static Future<MoviesResponse> getMoviesByGenre(String genre) async {
     Uri url = Uri.https(_authority, _moviesEndPoint, {'genre': genre});
-    http.Response serverResponse = await http.get(url);
-    Map<String, dynamic> json = jsonDecode(serverResponse.body);
-    MoviesResponse moviesResponseByGenre = MoviesResponse.fromJson(json);
-    return moviesResponseByGenre;
+    final json = await _getServerResponse(url);
+    if (json != null) {
+      return MoviesResponse.fromJson(json);
+    }
+    return MoviesResponse(status: 'error', statusMessage: 'Failed to load movies');
   }
 
   static Future<MoviesResponse> searchMovies(String query) async {
     Uri url = Uri.https(_authority, _moviesEndPoint, {'query_term': query});
-    http.Response serverResponse = await http.get(url);
-    Map<String, dynamic> json = jsonDecode(serverResponse.body);
-    MoviesResponse moviesResponse = MoviesResponse.fromJson(json);
-    return moviesResponse;
+    final json = await _getServerResponse(url);
+    if (json != null) {
+      return MoviesResponse.fromJson(json);
+    }
+    return MoviesResponse(status: 'error', statusMessage: 'Failed to search movies');
   }
 
   static Future<MoviesResponse> getMovieSuggestions(String movieId) async {
     Uri url = Uri.https(_authority, _movieSuggestions, {'movie_id': movieId});
-    http.Response serverResponse = await http.get(url);
-    Map<String, dynamic> json = jsonDecode(serverResponse.body);
-    MoviesResponse moviesResponse = MoviesResponse.fromJson(json);
-    return moviesResponse;
+    final json = await _getServerResponse(url);
+    if (json != null) {
+      return MoviesResponse.fromJson(json);
+    }
+    return MoviesResponse(status: 'error', statusMessage: 'Failed to load suggestions');
   }
 
   static Future<MovieDetailedResponse> getMovieDetails(String movieId) async {
@@ -49,22 +80,29 @@ class ApiServices {
       'with_images': 'true',
       'with_cast': 'true',
     });
-    http.Response serverResponse = await http.get(url);
-    Map<String, dynamic> json = jsonDecode(serverResponse.body);
-    MovieDetailedResponse movieDetailedResponse =
-        MovieDetailedResponse.fromJson(json);
-    MoviesResponse moviesResponse = await ApiServices.getMovieSuggestions(
-      movieId
+    final json = await _getServerResponse(url);
+    if (json != null) {
+      MovieDetailedResponse movieDetailedResponse =
+          MovieDetailedResponse.fromJson(json);
+      MoviesResponse moviesResponse = await getMovieSuggestions(movieId);
+      if (movieDetailedResponse.data?.movie != null) {
+        movieDetailedResponse.data!.movie!.similarMovies =
+            moviesResponse.data?.movies ?? [];
+      }
+      return movieDetailedResponse;
+    }
+    return MovieDetailedResponse(
+      status: 'error',
+      statusMessage: 'Failed to load details',
     );
-    movieDetailedResponse.data!.movie!.similarMovies = moviesResponse.data?.movies ?? [];
-    return movieDetailedResponse;
   }
 
-  static Future<Movies> getMovieById(String movieId) async {
+  static Future<Movies?> getMovieById(String movieId) async {
     Uri url = Uri.https(_authority, _moviesEndPoint, {'movie_id': movieId});
-    http.Response serverResponse = await http.get(url);
-    Map<String, dynamic> json = jsonDecode(serverResponse.body);
-    Movies movies = Movies.fromJson(json);
-    return movies;
+    final json = await _getServerResponse(url);
+    if (json != null) {
+      return Movies.fromJson(json);
+    }
+    return null;
   }
 }
