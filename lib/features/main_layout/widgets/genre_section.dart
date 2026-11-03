@@ -4,10 +4,13 @@ import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/api/movie_response/movies_response.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
+import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/provider/config_provider.dart';
+import 'package:movies_app/repos/movie_repo/movie_repo.dart';
+import 'package:movies_app/view_models/genre_view_model/genre_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -21,12 +24,12 @@ class GenreSection extends StatefulWidget {
 }
 
 class _GenreSectionState extends State<GenreSection> {
-  late Future<MoviesResponse> genreFuture;
+
 
   @override
   void initState() {
     super.initState();
-    genreFuture = ApiServices.getMoviesByGenre(widget.genre);
+
   }
 
   @override
@@ -68,47 +71,59 @@ class _GenreSectionState extends State<GenreSection> {
         SizedBox(height: 12),
         SizedBox(
           height: 240,
-          child: FutureBuilder<MoviesResponse>(
-            future: genreFuture,
-            builder: (context, snapshot) {
-              bool isLoading = snapshot.connectionState == ConnectionState.waiting;
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text(
-                    "Error loading",
-                    style: TextStyle(color: Colors.white70),
+          child: ChangeNotifierProvider(
+            create: (_) => GenreViewModel(movieRepo: MovieRepo())..loadMoviesByGenre(widget.genre),
+            child: Consumer<GenreViewModel>(
+              builder: (context, viewModel, child) {
+                if(viewModel.errorMessage != null && viewModel.movies.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "Error loading movies",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+
+                }
+                const SizedBox(height: 20,);
+                CustomElevatedButton(title: Text("Try Again"), onPressed: (){context.read<GenreViewModel>().loadMoviesByGenre(widget.genre);}, backgroundColor: ColorsManager.yellow);
+                if(!viewModel.isLoading && viewModel.movies.isEmpty){
+                  return const Center(
+                    child: Text(
+                      "No movies found",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                }
+                bool isLoading = viewModel.isLoading;
+                final List<Movies> movies = viewModel.movies.isNotEmpty
+                    ? viewModel.movies
+                    : List.generate(
+                        6,
+                        (index) => Movies(
+                          title: "Loading Movie",
+                          rating: 0.0,
+                          year: 2024,
+                          mediumCoverImage: "",
+                        ),
+                      );
+
+                return Skeletonizer(
+                  enabled: isLoading,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: movies.length,
+                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: 140,
+                        margin: EdgeInsets.only(right: 12),
+                        child: MovieItem(movie: movies[index]),
+                      );
+                    },
                   ),
                 );
-              }
-
-              List<Movies> movies = (snapshot.hasData && snapshot.data?.data?.movies != null)
-                  ? snapshot.data!.data!.movies!.take(15).toList()
-                  : List.generate(
-                      6,
-                      (index) => Movies(
-                        title: "Loading Movie",
-                        rating: 0.0,
-                        year: 2024,
-                        mediumCoverImage: "",
-                      ),
-                    );
-
-              return Skeletonizer(
-                enabled: isLoading,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: movies.length,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  itemBuilder: (context, index) {
-                    return Container(
-                      width: 140,
-                      margin: EdgeInsets.only(right: 12),
-                      child: MovieItem(movie: movies[index]),
-                    );
-                  },
-                ),
-              );
-            },
+              },
+            ),
           ),
         ),
         SizedBox(height: 24),
