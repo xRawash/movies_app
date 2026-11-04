@@ -312,19 +312,15 @@ class FirebaseServices {
           .timeout(const Duration(seconds: 3));
       if (result.isEmpty || result[0].rawAddress.isEmpty) {
         Utilities.showToast(l10n.networkError);
-        if (!context.mounted) return;
-        Navigator.pop(context);
         return;
       }
     } catch (_) {
       Utilities.showToast(l10n.networkError);
-      if (!context.mounted) return;
-      Navigator.pop(context);
       return;
     }
     try {
-      await userDocument.delete();
       await FirebaseAuth.instance.currentUser!.delete();
+      await userDocument.delete();
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn.instance.signOut();
       UserModel.loggedInUser = null;
@@ -345,15 +341,6 @@ class FirebaseServices {
   }
 
   static Future<void> updateProfile({required String name, required String phone, required String avatarSeed}) async {
-    try {
-      final result = await InternetAddress.lookup('google.com')
-          .timeout(const Duration(seconds: 3));
-      if (result.isEmpty || result[0].rawAddress.isEmpty) {
-        return;
-      }
-    } catch (_) {
-      return;
-    }
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(

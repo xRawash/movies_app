@@ -10,7 +10,7 @@ class CustomElevatedButton extends StatelessWidget {
   });
 
   final Widget title;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final Color backgroundColor;
   final Color? borderColor;
 
