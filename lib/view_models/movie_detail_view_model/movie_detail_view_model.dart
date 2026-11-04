@@ -12,13 +12,17 @@ class MovieDetailViewModel extends ChangeNotifier {
   String? errorMessage;
   bool isLoading = false;
   Movie? movie;
+  int _requestId = 0;
+
 
   Future<void> getMovieDetails(String movieId) async {
+    final currentRequestId = ++_requestId;
     isLoading = true;
     errorMessage = null;
     notifyListeners();
     try {
       final response = await _movieRepo.getMovieDetails(movieId);
+      if (currentRequestId != _requestId) return;
       if (response.status != "ok" || response.data?.movie == null) {
         errorMessage = response.statusMessage;
         Utilities.showToast("Failed to load movie details");
@@ -26,10 +30,14 @@ class MovieDetailViewModel extends ChangeNotifier {
         movie = response.data?.movie;
       }
     } catch (e) {
+      if (currentRequestId != _requestId) return;
       errorMessage = e.toString();
     } finally {
-      isLoading = false;
-      notifyListeners();
+      if (currentRequestId == _requestId) {
+        isLoading = false;
+        notifyListeners();
+      }
+
     }
   }
 }

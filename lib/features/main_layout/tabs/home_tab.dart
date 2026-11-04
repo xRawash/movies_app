@@ -27,11 +27,11 @@ class _HomeTabState extends State<HomeTab> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 0.55, initialPage: 8);
-    _currentPage = 8.0;
+    _pageController = PageController(viewportFraction: 0.55, initialPage: 0);
+    _currentPage = 0.0;
     _pageController.addListener(() {
       setState(() {
-        _currentPage = _pageController.page ?? 8.0;
+        _currentPage = _pageController.page ?? 0.0;
       });
     });
   }

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:movies_app/api/movie_detailed_response/movie.dart';
 import 'package:page_transition/page_transition.dart';
 
 import 'package:movies_app/features/auth/forget_password/forget_password.dart';
@@ -47,14 +48,30 @@ class RoutesManager {
         return _buildRoute(settings, MovieDetails());
 
       case torrentPlayer:
-        final args = settings.arguments as Map<String, dynamic>?;
+        final args = settings.arguments;
+
+        if (args is! Map<String, dynamic>) {
+          return null;
+        }
+
+        final magnetLink = args['magnetLink'];
+        final torrentId = args['torrentId'];
+        final movie = args['movie'];
+
+        if (magnetLink is! String ||
+            magnetLink.isEmpty ||
+            torrentId is! String ||
+            torrentId.isEmpty ||
+            movie is! Movie) {
+          return null;
+        }
 
         return _buildRoute(
           settings,
           TorrentPlayerScreen(
-            magnetLink: args?['magnetLink'] ?? '',
-            torrentId: args?['torrentId'] ?? '',
-            movie: args!['movie'],
+            magnetLink: magnetLink,
+            torrentId: torrentId,
+            movie: movie,
           ),
         );
 

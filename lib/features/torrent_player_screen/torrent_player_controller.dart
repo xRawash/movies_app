@@ -17,7 +17,7 @@ class TorrentPlayerController extends ChangeNotifier {
   final _engine = LibtorrentFlutter.instance;
   String get _resumeKey => 'resume_$torrentId';
   Movie movie;
-
+  bool _historySaved = false;
   int? _torrentNativeId;
   StreamSubscription? _torrentSub;
   StreamSubscription? _streamSub;
@@ -100,6 +100,7 @@ class TorrentPlayerController extends ChangeNotifier {
       }
 
       _videoController = video;
+      _videoController!.addListener(_checkPlaybackCompletion);
       _chewieController = ChewieController(
         videoPlayerController: _videoController!,
         autoPlay: true,
@@ -126,6 +127,28 @@ class TorrentPlayerController extends ChangeNotifier {
       }
     }
   }
+  void _checkPlaybackCompletion() {
+    final video = _videoController;
+
+    if (video == null || !video.value.isInitialized) return;
+    if (_historySaved) return;
+
+    final remainingTime =
+        video.value.duration - video.value.position;
+
+    if (remainingTime <= const Duration(seconds: 10)) {
+      _historySaved = true;
+      _addMovieToHistory();
+    }
+  }
+
+  Future<void> _addMovieToHistory() async {
+    try {
+      await FirebaseServices.addMovieToHistory(movie);
+    } catch (e) {
+      Utilities.showToast('Failed to save movie history: $e');
+    }
+  }
 
   void _savePosition() {
     final v = _videoController?.value;
@@ -139,21 +162,14 @@ class TorrentPlayerController extends ChangeNotifier {
       PrefsManager.prefs.setInt(_resumeKey, position);
     }
   }
-  void addMovieToHistory() async {
-    final nearEnd = _videoController!.value.duration.inMilliseconds - _videoController!.value.position.inMilliseconds < 10000;
-    if (nearEnd) {
-      await FirebaseServices.addMovieToHistory(movie);
-    }
-  }
-
   @override
   void dispose() {
     _disposed = true;
     _savePosition();
     _torrentSub?.cancel();
     _streamSub?.cancel();
-    _videoController?.dispose();
     _chewieController?.dispose();
+    _videoController?.dispose();
     if (_torrentNativeId != null) {
       _engine.disposeTorrent(_torrentNativeId!);
     }

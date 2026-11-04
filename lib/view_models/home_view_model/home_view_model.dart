@@ -10,15 +10,18 @@ class HomeViewModel extends ChangeNotifier {
   List<Movies> movies = [];
   bool isLoading = false;
   String? errorMessage;
+  int _requestId = 0;
+
 
   Future<void> loadMovies() async {
+    final currentRequestId = ++_requestId;
     isLoading = true;
     errorMessage = null;
     notifyListeners();
 
     try{
       final response = await _movieRepo.getHomeMovies();
-
+      if (currentRequestId != _requestId) return;
       if(response.status != 'ok' || response.data?.movies == null) {
         errorMessage = response.statusMessage;
         Utilities.showToast(errorMessage!);
@@ -26,10 +29,14 @@ class HomeViewModel extends ChangeNotifier {
       }
       movies = response.data!.movies!.take(15).toList();
     } catch(e) {
+      if (currentRequestId != _requestId) return;
       errorMessage = e.toString();
     } finally {
-      isLoading = false;
-      notifyListeners();
+      if (currentRequestId == _requestId){
+        isLoading = false;
+        notifyListeners();
+      }
+
     }
   }
 }
