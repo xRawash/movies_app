@@ -22,10 +22,10 @@ class UpdateProfile extends StatefulWidget {
 }
 
 class _UpdateProfileState extends State<UpdateProfile> {
-  late String avatarSeed;
   late TextEditingController _nameController;
   late PhoneController _phoneController;
   PhoneNumber? initialPhone;
+  final _formKey = GlobalKey<FormState>();
 
 
   @override
@@ -70,7 +70,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
           UpdateProfileViewModel(updateProfileRepo: UpdateProfileRepo()),
       child: Consumer<UpdateProfileViewModel>(
         builder: (context, viewModel, child) {
-          avatarSeed = viewModel.avatarSeed;
           return Scaffold(
             appBar: AppBar(title: Text(l10n.updateProfile), centerTitle: true),
             body: SingleChildScrollView(
@@ -134,25 +133,31 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         height: 150,
                         child: CircleAvatar(
                           child: Image.network(
-                            viewModel.getAvatarLink(avatarSeed),
+                            viewModel.getAvatarLink(viewModel.avatarSeed),
                           ),
                         ),
                       ),
                     ),
                     SizedBox(height: 16),
-                    CustomTextField(
-                      controller: _nameController,
-                      hint: "",
-                      prefixIcon: Icon(Icons.person),
-                    ),
-                    SizedBox(height: 20),
                     Form(
+                      key: _formKey,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      child: CustomPhoneField(
-                        controller: _phoneController,
-                        hint: l10n.phone,
+                      child: Column(
+                        children: [
+                          CustomTextField(
+                            controller: _nameController,
+                            hint: "",
+                            prefixIcon: Icon(Icons.person),
+                          ),
+                          SizedBox(height: 20),
+                          CustomPhoneField(
+                              controller: _phoneController,
+                              hint: l10n.phone,
+                            ),
+                        ],
                       ),
                     ),
+
                     SizedBox(height: 20),
                     Container(
                       padding: EdgeInsets.all(16),
@@ -209,6 +214,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       onPressed: viewModel.isLoading
                           ? null
                           : () async {
+                        if (!_formKey.currentState!.validate()) return;
                         final success = await viewModel.updateAccount(
                           newName: _nameController.text.trim(),
                           newPhone: _phoneController.value.international,
