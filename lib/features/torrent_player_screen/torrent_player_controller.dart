@@ -6,6 +6,7 @@ import 'package:libtorrent_flutter/libtorrent_flutter.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
+import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/prefs_manager/prefs_manager.dart';
 import 'package:video_player/video_player.dart';
 
@@ -134,6 +135,7 @@ class TorrentPlayerController extends ChangeNotifier {
     final nearEnd = v.duration.inMilliseconds - position < 10000;
     if (nearEnd) {
       PrefsManager.prefs.remove(_resumeKey);
+      UserModel.loggedInUser!.watchedMovies?.add(movie.toJson());
       FirebaseServices.addMovieToHistory(movie);
     } else {
       PrefsManager.prefs.setInt(_resumeKey, position);

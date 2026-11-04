@@ -266,9 +266,14 @@ class FirebaseServices {
     var l10n = AppLocalizations.of(context)!;
     try {
       await FirebaseAuth.instance.signOut();
-      await GoogleSignIn.instance.signOut();
-      Utilities.showToast(l10n.loggedOutSuccessfully);
       UserModel.loggedInUser = null;
+      try {
+        await GoogleSignIn.instance.signOut();
+      } catch (e) {
+        Utilities.showToast("Error signing out from Google: $e");
+      }
+      Utilities.showToast(l10n.loggedOutSuccessfully);
+
       return true;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -290,10 +295,13 @@ class FirebaseServices {
     final firebaseUser = FirebaseAuth.instance.currentUser;
 
     if (firebaseUser == null) {
-      Utilities.showToast('No authenticated user found.');
+      throw FirebaseAuthException(
+        code: 'no-current-user',
+        message: 'No authenticated user found.',
+      );
     }
 
-    final userId = firebaseUser!.uid;
+    final userId = firebaseUser.uid;
     final userDocument = _getUsersCollectionReference().doc(userId);
 
     try {
@@ -340,7 +348,6 @@ class FirebaseServices {
     bool exists = UserModel.loggedInUser!.wishListMovies!
         .any((item) => item['id'] == movie.id);
     if (!exists) {
-      UserModel.loggedInUser!.wishListMovies!.add(movie.toJson());
       await userDocument.update(UserModel.loggedInUser!.toJson());
     }
   }
@@ -354,7 +361,6 @@ class FirebaseServices {
     bool exists = UserModel.loggedInUser!.watchedMovies!
         .any((item) => item['id'] == movie.id);
     if (!exists) {
-      UserModel.loggedInUser!.watchedMovies!.add(movie.toJson());
       await userDox.update(UserModel.loggedInUser!.toJson());
     }
   }
@@ -364,10 +370,10 @@ class FirebaseServices {
         _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
-    );
-    await userDocument.update(UserModel.loggedInUser!.toJson());
-    UserModel.loggedInUser!.wishListMovies!
+    );UserModel.loggedInUser!.wishListMovies!
         .removeWhere((item) => item['id'] == movie.id);
+    await userDocument.update(UserModel.loggedInUser!.toJson());
+
   }
 
   static Future<void> resetPassword(String email, BuildContext context) async {
