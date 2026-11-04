@@ -5,9 +5,11 @@ import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
-import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/models/user_model.dart';
+import 'package:movies_app/repos/profile_repo/profile_repo.dart';
+import 'package:movies_app/view_models/profile_view_model/profile_view_model.dart';
+import 'package:provider/provider.dart';
 
 class ProfileTab extends StatefulWidget {
   const ProfileTab({super.key});
@@ -17,181 +19,206 @@ class ProfileTab extends StatefulWidget {
 }
 
 class _ProfileTabState extends State<ProfileTab> {
-  UserModel currentUser = UserModel.loggedInUser!;
-  late String avatarSeed;
-  int selectedTab = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    avatarSeed = currentUser.avatarName ?? " ";
-  }
 
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
-    currentUser = UserModel.loggedInUser!;
-    List<Map<String, dynamic>> movies = selectedTab == 0
-        ? (currentUser.wishListMovies ?? [])
-        : (currentUser.watchedMovies ?? []);
 
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.only(top: 50, left: 16, right: 16, bottom: 16),
-              color: ColorsManager.darkGrey,
+    return ChangeNotifierProvider(
+      create: (_) => ProfileViewModel(profileRepo: ProfileRepo()),
+      child: Consumer<ProfileViewModel>(
+        builder: (context, viewModel, child) {
+          if(viewModel.isLoading == true) {
+            return Center(child: CircularProgressIndicator(color: ColorsManager.yellow,));
+          }
+          return SafeArea(
+            child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  Container(
+                    padding: EdgeInsets.only(
+                      top: 50,
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
+                    ),
+                    color: ColorsManager.darkGrey,
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            SizedBox(
-                              width: 100,
-                              height: 100,
-                              child: CircleAvatar(
-                                child: Image.network(
-                                  "https://api.dicebear.com/7.x/avataaars/png?seed=$avatarSeed",
-                                ),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 100,
+                                    height: 100,
+                                    child: CircleAvatar(
+                                      child: Image.network(
+                                        viewModel.getAvatarLink() ?? "",
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    viewModel.currentUser.name ?? " ",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineLarge,
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              currentUser.name ?? " ",
-                              style: Theme.of(context).textTheme.headlineLarge,
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text(
+                                    (viewModel.currentUser.wishListMovies ?? [])
+                                        .length
+                                        .toString(),
+                                    style: Theme.of(context).textTheme.labelLarge!
+                                        .copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    l10n.wishList,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text(
+                                    (viewModel.currentUser.watchedMovies ?? [])
+                                        .length
+                                        .toString(),
+                                    style: Theme.of(context).textTheme.labelLarge!
+                                        .copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    l10n.history,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium,
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      Expanded(
-                        child: Column(
+                        SizedBox(height: 23),
+                        Row(
                           children: [
-                            Text(
-                              (currentUser.wishListMovies ?? []).length.toString(),
-                              style: Theme.of(context).textTheme.labelLarge!
-                                  .copyWith(fontWeight: FontWeight.bold),
+                            Expanded(
+                              flex: 2,
+                              child: CustomElevatedButton(
+                                title: Text(
+                                  l10n.editProfile,
+                                  style: Theme.of(context).textTheme.titleMedium!
+                                      .copyWith(fontWeight: FontWeight.normal),
+                                ),
+                                onPressed: () async {
+                                  await Navigator.pushNamed(
+                                    context,
+                                    RoutesManager.updateProfile,
+                                  );
+                                  setState(() {
+                                    viewModel.currentUser =
+                                    UserModel.loggedInUser!;
+                                    viewModel.avatarSeed =
+                                        viewModel.currentUser.avatarName ?? " ";
+                                  });
+                                },
+                                backgroundColor: ColorsManager.yellow,
+                              ),
                             ),
-                            Text(
-                              l10n.wishList,
-                              style: Theme.of(context).textTheme.labelMedium,
+                            SizedBox(width: 10),
+                            Expanded(
+                              flex: 1,
+                              child: CustomElevatedButton(
+                                title: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        l10n.exit,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                      ),
+                                    ),
+                                    Icon(Icons.logout, color: Colors.white),
+                                  ],
+                                ),
+                                onPressed: () async {
+                                  await context.read<ProfileViewModel>().signOut(
+                                    context,
+                                  );
+                                },
+                                backgroundColor: ColorsManager.red,
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            Text(
-                              (currentUser.watchedMovies ?? []).length.toString(),
-                              style: Theme.of(context).textTheme.labelLarge!
-                                  .copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              l10n.history,
-                              style: Theme.of(context).textTheme.labelMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 23),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: CustomElevatedButton(
-                          title: Text(
-                            l10n.editProfile,
-                            style: Theme.of(context).textTheme.titleMedium!
-                                .copyWith(fontWeight: FontWeight.normal),
-                          ),
-                          onPressed: () async {
-                            await Navigator.pushNamed(
-                              context,
-                              RoutesManager.updateProfile,
-                            );
-                            setState(() {
-                              currentUser = UserModel.loggedInUser!;
-                              avatarSeed = currentUser.avatarName ?? " ";
-                            });
-                          },
-                          backgroundColor: ColorsManager.yellow,
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        flex: 1,
-                        child: CustomElevatedButton(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  l10n.exit,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
+                        SizedBox(height: 10),
+                        DefaultTabController(
+                          initialIndex: viewModel.selectedTab,
+                          length: 2,
+                          child: TabBar(
+                            onTap: (index) {
+                              context.read<ProfileViewModel>().changeSelectedTab(
+                                index,
+                              );
+                            },
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            unselectedLabelStyle: Theme.of(context)
+                                .textTheme
+                                .bodyMedium,
+                            labelStyle: Theme.of(context).textTheme.bodyMedium,
+                            indicatorColor: ColorsManager.yellow,
+                            tabs: [
+                              Tab(
+                                text: l10n.wishList,
+                                icon: Icon(
+                                  Icons.list,
+                                  color: ColorsManager.yellow,
                                 ),
                               ),
-                              Icon(Icons.logout, color: Colors.white),
+                              Tab(
+                                text: l10n.history,
+                                icon: Icon(
+                                  Icons.folder,
+                                  color: ColorsManager.yellow,
+                                ),
+                              ),
                             ],
                           ),
-                          onPressed: () async {
-                            await FirebaseServices.signOut(context);
-                          },
-                          backgroundColor: ColorsManager.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  DefaultTabController(
-                    initialIndex: selectedTab,
-                    length: 2,
-                    child: TabBar(
-                      onTap: (index) {
-                        setState(() {
-                          selectedTab = index;
-                        });
-                      },
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      unselectedLabelStyle: Theme.of(context)
-                          .textTheme
-                          .bodyMedium,
-                      labelStyle: Theme.of(context).textTheme.bodyMedium,
-                      indicatorColor: ColorsManager.yellow,
-                      tabs: [
-                        Tab(
-                          text: l10n.wishList,
-                          icon: Icon(Icons.list, color: ColorsManager.yellow),
-                        ),
-                        Tab(
-                          text: l10n.history,
-                          icon: Icon(Icons.folder, color: ColorsManager.yellow),
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  movies.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 40.0),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        viewModel.moviesList().isEmpty
+                            ? Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 40.0,
+                          ),
                           child: Image.asset(ImageAssets.empty),
                         )
-                      : GridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            : GridView.builder(
+                          gridDelegate:
+                          SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
@@ -199,24 +226,29 @@ class _ProfileTabState extends State<ProfileTab> {
                           ),
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
-                          itemCount: movies.length,
+                          itemCount: viewModel.moviesList().length,
                           itemBuilder: (context, index) {
-                            Movies movie = Movies.fromJson(movies[index]);
+                            Movies movie = Movies.fromJson(
+                              viewModel.moviesList()[index],
+                            );
                             return MovieItem(
                               movie: movie,
                               onNavigateBack: () {
-                                setState(() {
-                                  currentUser = UserModel.loggedInUser!;
-                                });
+                                context
+                                    .read<ProfileViewModel>()
+                                    .updateCurrentUser();
                               },
                             );
                           },
                         ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
-        ),
+          );
+        }
       ),
     );
   }

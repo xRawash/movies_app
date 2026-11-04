@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/api/api_services.dart';
 import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';

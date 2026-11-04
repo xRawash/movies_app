@@ -1,9 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:movies_app/api/api_services.dart';
 import 'package:movies_app/api/movie_response/movies.dart';
-import 'package:movies_app/api/movie_response/movies_response.dart';
 import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';

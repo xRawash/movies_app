@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
-import 'package:movies_app/firebase/firebase_services.dart';
-import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/view_models/bookmark_view_model/bookmark_view_model.dart';
 import 'package:provider/provider.dart';
 

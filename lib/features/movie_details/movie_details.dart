@@ -235,13 +235,11 @@ class _MovieDetailsState extends State<MovieDetails> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) => ClipRRect(
                               borderRadius: BorderRadius.circular(16),
-                              child: Image.network(
-                                detailedMovie.mediumScreenshotImages.isNotEmpty
-                                    ? detailedMovie
-                                          .mediumScreenshotImages[index]
-                                    : '',
+                              child: detailedMovie.mediumScreenshotImages.isNotEmpty
+                                  ? Image.network(
+                                detailedMovie.mediumScreenshotImages[index],
                                 fit: BoxFit.cover,
-                              ),
+                              ) : Icon(Icons.image),
                             ),
                             separatorBuilder: (context, index) =>
                                 SizedBox(height: 10),

@@ -1,13 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
+import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/models/user_model.dart';
-
-import '../core/sources/routes_manager.dart';
 
 class FirebaseServices {
   static CollectionReference<Map<String, dynamic>>
@@ -263,14 +265,26 @@ class FirebaseServices {
     }
   }
 
-  static Future<void> signOut(BuildContext context) async {
+  static Future<bool> signOut(BuildContext context) async {
     var l10n = AppLocalizations.of(context)!;
+    try {
+      final result = await InternetAddress.lookup('google.com')
+          .timeout(const Duration(seconds: 3));
+      if (result.isEmpty || result[0].rawAddress.isEmpty) {
+        Utilities.showToast(l10n.networkError);
+        return false;
+      }
+    } catch (_) {
+      Utilities.showToast(l10n.networkError);
+      return false;
+    }
+
     try {
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn.instance.signOut();
-      if (!context.mounted) return;
       Utilities.showToast(l10n.loggedOutSuccessfully);
-      Navigator.pushReplacementNamed(context, RoutesManager.login);
+      UserModel.loggedInUser = null;
+      return true;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'network-request-failed':
@@ -279,8 +293,10 @@ class FirebaseServices {
         default:
           Utilities.showToast(l10n.signOutFailed);
       }
+      return false;
     } catch (e) {
       Utilities.showToast(l10n.signOutFailed);
+      return false;
     }
   }
 
@@ -291,6 +307,21 @@ class FirebaseServices {
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
+    try {
+      final result = await InternetAddress.lookup('google.com')
+          .timeout(const Duration(seconds: 3));
+      if (result.isEmpty || result[0].rawAddress.isEmpty) {
+        Utilities.showToast(l10n.networkError);
+        if (!context.mounted) return;
+        Navigator.pop(context);
+        return;
+      }
+    } catch (_) {
+      Utilities.showToast(l10n.networkError);
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      return;
+    }
     try {
       await userDocument.delete();
       await FirebaseAuth.instance.currentUser!.delete();
@@ -314,6 +345,21 @@ class FirebaseServices {
 
   static Future<void> updateProfile(BuildContext context) async {
     var l10n = AppLocalizations.of(context)!;
+    try {
+      final result = await InternetAddress.lookup('google.com')
+          .timeout(const Duration(seconds: 3));
+      if (result.isEmpty || result[0].rawAddress.isEmpty) {
+        Utilities.showToast(l10n.networkError);
+        if (!context.mounted) return;
+        Navigator.pop(context);
+        return;
+      }
+    } catch (_) {
+      Utilities.showToast(l10n.networkError);
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      return;
+    }
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
