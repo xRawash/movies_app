@@ -135,9 +135,14 @@ class TorrentPlayerController extends ChangeNotifier {
     final nearEnd = v.duration.inMilliseconds - position < 10000;
     if (nearEnd) {
       PrefsManager.prefs.remove(_resumeKey);
-      FirebaseServices.addMovieToHistory(movie);
     } else {
       PrefsManager.prefs.setInt(_resumeKey, position);
+    }
+  }
+  void addMovieToHistory() async {
+    final nearEnd = _videoController!.value.duration.inMilliseconds - _videoController!.value.position.inMilliseconds < 10000;
+    if (nearEnd) {
+      await FirebaseServices.addMovieToHistory(movie);
     }
   }
 

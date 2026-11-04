@@ -18,12 +18,13 @@ class SearchViewModel extends ChangeNotifier{
   int _requestId =0;
 
   void searchMovies(String value) {
-    query = value.trim();
 
+    query = value.trim();
+    _requestId++;
     _debounce?.cancel();
 
     if(query.isEmpty){
-      _requestId++;
+
       movies = [];
       isLoading = false;
       errorMessage = null;
@@ -35,7 +36,7 @@ class SearchViewModel extends ChangeNotifier{
   }
 
   Future<void> loadMovieSearchResults(String searchQuery) async {
-    final int currentRequestId = ++_requestId;
+    final int currentRequestId = _requestId;
     isLoading = true;
     errorMessage = null;
     notifyListeners();

@@ -50,8 +50,7 @@ class _SearchTabState extends State<SearchTab> {
                   hint: l10n.search,
                   prefixIcon: Icon(Icons.search),
                   onChanged: (value) {
-                   context.read<SearchViewModel>().searchMovies(value ?? '');
-                   return null;
+                   context.read<SearchViewModel>().searchMovies(value);
                   },
                 ),
                 SizedBox(height: 16),

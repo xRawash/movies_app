@@ -51,20 +51,24 @@ class _HomeTabState extends State<HomeTab> {
       child: Consumer<HomeViewModel>(
         builder: (context, viewModel, child) {
           if (viewModel.errorMessage != null && viewModel.movies.isEmpty) {
-            return const Center(
-              child: Text(
-                "Error loading movies",
-                style: TextStyle(color: Colors.white),
+            return Center(
+              child: Column(
+                children: [
+                  const Text(
+                    "Error loading movies",
+                    style: TextStyle(color: Colors.white),
+                  ),const SizedBox(height: 12,),
+                  CustomElevatedButton(title: Text("Try Again", style: Theme
+                      .of(context)
+                      .textTheme
+                      .bodyLarge,), onPressed: () {
+                    context.read<HomeViewModel>().loadMovies();
+                  }, backgroundColor: ColorsManager.yellow)
+                ],
               ),
             );
           }
-          const SizedBox(height: 12,);
-          CustomElevatedButton(title: Text("Try Again", style: Theme
-              .of(context)
-              .textTheme
-              .bodyLarge,), onPressed: () {
-            context.read<HomeViewModel>().loadMovies();
-          }, backgroundColor: ColorsManager.yellow);
+
           if(!viewModel.isLoading && viewModel.movies.isEmpty){
             return const Center(
               child: Text(

@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:movies_app/api/movie_detailed_response/movie_detailed_response.dart';
 import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/api/movie_response/movies_response.dart';
-import 'package:movies_app/core/utilities/utilities.dart';
 
 class ApiServices {
   static const String _authority = "yts.am";
@@ -28,8 +27,6 @@ class ApiServices {
       throw Exception("Request timed out");
     } on FormatException {
       throw Exception("Invalid response format");
-    } catch (e) {
-      throw Exception("An error occurred: $e");
     }
   }
 
@@ -79,10 +76,12 @@ class ApiServices {
     if (json != null) {
       MovieDetailedResponse movieDetailedResponse =
           MovieDetailedResponse.fromJson(json);
-      MoviesResponse moviesResponse = await getMovieSuggestions(movieId);
-      if (movieDetailedResponse.data?.movie != null) {
+      try {
+        final suggestions = await getMovieSuggestions(movieId);
         movieDetailedResponse.data!.movie!.similarMovies =
-            moviesResponse.data?.movies ?? [];
+            suggestions.data?.movies ?? [];
+      } catch (e) {
+        movieDetailedResponse.data?.movie?.similarMovies = [];
       }
       return movieDetailedResponse;
     }

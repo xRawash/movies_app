@@ -14,7 +14,6 @@ class GenreViewModel extends ChangeNotifier {
 
   Future<void> loadMoviesByGenre(String genre) async {
     final currentRequestId = ++_requestId;
-    if (currentRequestId != _requestId) return;
     isLoading = true;
     errorMessage = null;
     notifyListeners();
