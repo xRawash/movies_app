@@ -1,72 +1,83 @@
-import 'package:flutter/cupertino.dart';
-import 'package:movies_app/core/utilities/utilities.dart';
-import 'package:movies_app/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/repos/update_profile_repo/update_profile_repo.dart';
-import 'package:phone_form_field/phone_form_field.dart';
 
 class UpdateProfileViewModel extends ChangeNotifier {
   final UpdateProfileRepo _updateProfileRepo;
 
-  UpdateProfileViewModel({required this._updateProfileRepo});
+  UpdateProfileViewModel({required UpdateProfileRepo updateProfileRepo})
+    : _updateProfileRepo = updateProfileRepo {
+    final user = UserModel.loggedInUser!;
+    name = user.name ?? '';
+    phone = user.phone ?? '';
+    avatarSeed = user.avatarName ?? 'default';
+  }
 
-  UserModel currentUser = UserModel.loggedInUser!;
-  String? avatarSeed = UserModel.loggedInUser!.avatarName;
-  PhoneNumber? initialPhone;
+  late String name;
+  late String phone;
+  late String avatarSeed;
+
   bool isLoading = false;
   String? errorMessage;
 
-  Future<void> updateAccount(BuildContext context, String newName, String newPhone) async {
-    AppLocalizations l10n = AppLocalizations.of(context)!;
+  String getAvatarLink(String seed) {
+    return 'https://api.dicebear.com/7.x/avataaars/png?seed=$seed';
+  }
+
+  void changeAvatarSeed(String seed) {
+    avatarSeed = seed;
+    notifyListeners();
+  }
+
+  Future<bool> updateAccount({
+    required String newName,
+    required String newPhone,
+  }) async {
+    if (isLoading) return false;
+
     isLoading = true;
     errorMessage = null;
     notifyListeners();
-    UserModel.loggedInUser!.name = newName;
-    UserModel.loggedInUser!.phone = newPhone;
-   try {
-     await _updateProfileRepo.updateAccount(context);
-   } catch (e) {
-     errorMessage = e.toString();
-     Utilities.showToast(l10n.somethingWentWrong);
-   } finally {
-     isLoading = false;
-     notifyListeners();
-   }
 
+    try {
+      await _updateProfileRepo.updateAccount(
+        name: newName,
+        phone: newPhone,
+        avatarSeed: avatarSeed,
+      );
 
+      final user = UserModel.loggedInUser!;
+      user.name = newName;
+      user.phone = newPhone;
+      user.avatarName = avatarSeed;
+
+      name = newName;
+      phone = newPhone;
+
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> deleteAccount(BuildContext context) async {
+    if (isLoading) return;
+
     isLoading = true;
     errorMessage = null;
     notifyListeners();
-    {
-      try {
-        await _updateProfileRepo.deleteAccount(context);
-      } on Exception catch (e) {
-        errorMessage = e.toString();
-      } finally {
-        isLoading = false;
-        notifyListeners();
-      }
+
+    try {
+      await _updateProfileRepo.deleteAccount(context);
+    } catch (e) {
+      errorMessage = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
-  }
-  void init() {
-    avatarSeed = currentUser.avatarName;
-    if (currentUser.phone != null && currentUser.phone!.isNotEmpty) {
-      try {
-        initialPhone = PhoneNumber.parse(currentUser.phone!);
-      } catch (e) {
-        initialPhone = null;
-      }
-    }
-  }
-  void changeAvatarSeed(String seed) {
-    UserModel.loggedInUser!.avatarName = seed;
-    notifyListeners();
-  }
-  String? getAvatarLink(String seed) {
-    String avatarLink = 'https://api.dicebear.com/7.x/avataaars/png?seed=$seed';
-    return avatarLink;
   }
 }

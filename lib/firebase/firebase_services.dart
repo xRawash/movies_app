@@ -327,6 +327,7 @@ class FirebaseServices {
       await FirebaseAuth.instance.currentUser!.delete();
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn.instance.signOut();
+      UserModel.loggedInUser = null;
       if (!context.mounted) return;
       Utilities.showToast(l10n.accountDeletedSuccessfully);
       Navigator.pushReplacementNamed(context, RoutesManager.login);
@@ -343,21 +344,14 @@ class FirebaseServices {
     }
   }
 
-  static Future<void> updateProfile(BuildContext context) async {
-    var l10n = AppLocalizations.of(context)!;
+  static Future<void> updateProfile({required String name, required String phone, required String avatarSeed}) async {
     try {
       final result = await InternetAddress.lookup('google.com')
           .timeout(const Duration(seconds: 3));
       if (result.isEmpty || result[0].rawAddress.isEmpty) {
-        Utilities.showToast(l10n.networkError);
-        if (!context.mounted) return;
-        Navigator.pop(context);
         return;
       }
     } catch (_) {
-      Utilities.showToast(l10n.networkError);
-      if (!context.mounted) return;
-      Navigator.pop(context);
       return;
     }
     CollectionReference<Map<String, dynamic>> usersCollection =
@@ -365,10 +359,13 @@ class FirebaseServices {
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    userDocument.update(UserModel.loggedInUser!.toJson());
-    if (!context.mounted) return;
-    Utilities.showToast(l10n.profileUpdatedSuccessfully);
-    Navigator.pop(context);
+    await userDocument.update(
+      {
+        'name': name,
+        'phone': phone,
+        'avatarName': avatarSeed,
+      },
+    );
   }
 
   static Future<void> addMovieToWishList(Movie movie) async {
@@ -395,7 +392,7 @@ class FirebaseServices {
         .any((item) => item['id'] == movie.id);
     if (!exists) {
       UserModel.loggedInUser!.watchedMovies!.add(movie.toJson());
-      userDox.update(UserModel.loggedInUser!.toJson());
+      await userDox.update(UserModel.loggedInUser!.toJson());
     }
   }
 

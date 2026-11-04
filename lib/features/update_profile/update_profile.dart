@@ -27,17 +27,33 @@ class _UpdateProfileState extends State<UpdateProfile> {
   late PhoneController _phoneController;
   PhoneNumber? initialPhone;
 
+
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: UserModel.loggedInUser!.name);
-    try {
-      initialPhone = PhoneNumber.parse(UserModel.loggedInUser!.phone!);
-    } catch (e) {
-      initialPhone = null;
+
+    final user = UserModel.loggedInUser!;
+
+    _nameController = TextEditingController(
+      text: user.name ?? '',
+    );
+
+    PhoneNumber? parsedPhone;
+
+    if (user.phone != null && user.phone!.isNotEmpty) {
+      try {
+        parsedPhone = PhoneNumber.parse(user.phone!);
+      } catch (_) {
+        parsedPhone = null;
+      }
     }
-    _phoneController = PhoneController(initialValue:initialPhone!);
+
+    _phoneController = PhoneController(
+      initialValue: parsedPhone ??
+          PhoneNumber(isoCode: IsoCode.EG, nsn: ''),
+    );
   }
+
 
   @override
   void dispose() {
@@ -48,13 +64,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
   @override
   Widget build(BuildContext context) {
-    avatarSeed = UserModel.loggedInUser!.avatarName!;
     var l10n = AppLocalizations.of(context)!;
     return ChangeNotifierProvider(
       create: (_) =>
           UpdateProfileViewModel(updateProfileRepo: UpdateProfileRepo()),
       child: Consumer<UpdateProfileViewModel>(
         builder: (context, viewModel, child) {
+          avatarSeed = viewModel.avatarSeed;
           return Scaffold(
             resizeToAvoidBottomInset: false,
             appBar: AppBar(title: Text(l10n.updateProfile), centerTitle: true),
@@ -83,9 +99,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                             itemCount: AvatarSeeds.avatars.length,
                             itemBuilder: (context, index) => InkWell(
                               onTap: () {
-                                context.read<UpdateProfileViewModel>().changeAvatarSeed(
-                                  AvatarSeeds.avatars[index],
-                                );
+                                viewModel.changeAvatarSeed(AvatarSeeds.avatars[index]);
                                 Navigator.pop(context);
                               },
                               child: Container(
@@ -99,10 +113,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                 ),
                                 child: ClipOval(
                                   child: Image.network(
-                                    viewModel.getAvatarLink(
-                                          AvatarSeeds.avatars[index],
-                                        ) ??
-                                        "",
+                                    "https://api.dicebear.com/7.x/avataaars/png?seed=${AvatarSeeds.avatars[index]}",
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (context, error, stackTrace) => Icon(
@@ -123,7 +134,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       height: 150,
                       child: CircleAvatar(
                         child: Image.network(
-                          viewModel.getAvatarLink(avatarSeed)!,
+                          viewModel.getAvatarLink(avatarSeed),
                         ),
                       ),
                     ),
@@ -179,7 +190,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       l10n.deleteAccount,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                    onPressed: () async {
+                    onPressed: viewModel.isLoading ? (){} : () async {
                       await context
                           .read<UpdateProfileViewModel>()
                           .deleteAccount(context);
@@ -192,14 +203,27 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       l10n.updateAccount,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    onPressed: () async {
-                      await context
-                          .read<UpdateProfileViewModel>()
-                          .updateAccount(
-                            context,
-                            _nameController.text,
-                            _phoneController.value.international,
-                          );
+                    onPressed: viewModel.isLoading
+                        ? (){}
+                        : () async {
+                      final success = await viewModel.updateAccount(
+                        newName: _nameController.text.trim(),
+                        newPhone: _phoneController.value.international,
+                      );
+
+                      if (!context.mounted) return;
+
+                      if (success) {
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              viewModel.errorMessage ?? 'Could not update profile',
+                            ),
+                          ),
+                        );
+                      }
                     },
                     backgroundColor: ColorsManager.yellow,
                   ),

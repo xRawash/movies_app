@@ -6,7 +6,6 @@ import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
-import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/repos/profile_repo/profile_repo.dart';
 import 'package:movies_app/view_models/profile_view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +30,7 @@ class _ProfileTabState extends State<ProfileTab> {
           if(viewModel.isLoading == true) {
             return Center(child: CircularProgressIndicator(color: ColorsManager.yellow,));
           }
+          final movies = viewModel.moviesList();
           return SafeArea(
             child: SingleChildScrollView(
               child: Column(
@@ -127,12 +127,10 @@ class _ProfileTabState extends State<ProfileTab> {
                                     context,
                                     RoutesManager.updateProfile,
                                   );
-                                  setState(() {
-                                    viewModel.currentUser =
-                                    UserModel.loggedInUser!;
-                                    viewModel.avatarSeed =
-                                        viewModel.currentUser.avatarName ?? " ";
-                                  });
+                                  if(!context.mounted) return;
+                                  context
+                                      .read<ProfileViewModel>()
+                                      .updateCurrentUser();
                                 },
                                 backgroundColor: ColorsManager.yellow,
                               ),
@@ -209,7 +207,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        viewModel.moviesList().isEmpty
+                        movies.isEmpty
                             ? Padding(
                           padding: const EdgeInsets.symmetric(
                             vertical: 40.0,
@@ -226,10 +224,10 @@ class _ProfileTabState extends State<ProfileTab> {
                           ),
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
-                          itemCount: viewModel.moviesList().length,
+                          itemCount: movies.length,
                           itemBuilder: (context, index) {
                             Movies movie = Movies.fromJson(
-                              viewModel.moviesList()[index],
+                              movies[index],
                             );
                             return MovieItem(
                               movie: movie,

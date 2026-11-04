@@ -12,7 +12,6 @@ class ProfileViewModel extends ChangeNotifier {
   String? errorMessage;
 
   UserModel currentUser = UserModel.loggedInUser!;
-  String? avatarSeed;
   int selectedTab = 0;
 
   Future<void> signOut(BuildContext context) async {
@@ -34,9 +33,9 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   String? getAvatarLink() {
-    avatarSeed = currentUser.avatarName ?? " ";
-    String avatarLink =
-        "https://api.dicebear.com/7.x/avataaars/png?seed=$avatarSeed";
+    final seed = currentUser.avatarName ?? "default";
+    final avatarLink =
+        "https://api.dicebear.com/7.x/avataaars/png?seed=$seed";
     return avatarLink;
   }
 
@@ -53,7 +52,11 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   void updateCurrentUser() {
-    currentUser = UserModel.loggedInUser!;
+    final user = UserModel.loggedInUser;
+
+    if (user == null) return;
+
+    currentUser = user;
     notifyListeners();
   }
 }
