@@ -6,7 +6,6 @@ import 'package:libtorrent_flutter/libtorrent_flutter.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
-import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/prefs_manager/prefs_manager.dart';
 import 'package:video_player/video_player.dart';
 
@@ -18,6 +17,7 @@ class TorrentPlayerController extends ChangeNotifier {
   String get _resumeKey => 'resume_$torrentId';
   Movie movie;
   bool _historySaved = false;
+  bool _historySaving = false;
   int? _torrentNativeId;
   StreamSubscription? _torrentSub;
   StreamSubscription? _streamSub;
@@ -131,22 +131,29 @@ class TorrentPlayerController extends ChangeNotifier {
     final video = _videoController;
 
     if (video == null || !video.value.isInitialized) return;
-    if (_historySaved) return;
+    if (_historySaved || _historySaving) return;
 
     final remainingTime =
         video.value.duration - video.value.position;
 
-    if (remainingTime <= const Duration(seconds: 10)) {
-      _historySaved = true;
+    if (video.value.position > Duration.zero &&
+        remainingTime <= const Duration(seconds: 10)) {
       _addMovieToHistory();
     }
   }
 
   Future<void> _addMovieToHistory() async {
+    if (_historySaved || _historySaving) return;
+
+    _historySaving = true;
+
     try {
       await FirebaseServices.addMovieToHistory(movie);
+      _historySaved = true;
     } catch (e) {
-      Utilities.showToast('Failed to save movie history: $e');
+      debugPrint('Failed to save movie history: $e');
+    } finally {
+      _historySaving = false;
     }
   }
 

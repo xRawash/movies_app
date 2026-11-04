@@ -19,6 +19,7 @@ class MovieDetailViewModel extends ChangeNotifier {
     final currentRequestId = ++_requestId;
     isLoading = true;
     errorMessage = null;
+    movie = null;
     notifyListeners();
     try {
       final response = await _movieRepo.getMovieDetails(movieId);
