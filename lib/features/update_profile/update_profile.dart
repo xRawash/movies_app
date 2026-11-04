@@ -71,216 +71,215 @@ class _UpdateProfileState extends State<UpdateProfile> {
       child: Consumer<UpdateProfileViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(title: Text(l10n.updateProfile), centerTitle: true),
-            body: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                          backgroundColor: Colors.transparent,
-                          context: context,
-                          builder: (context) => Container(
-                            margin: EdgeInsets.all(20),
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: ColorsManager.darkGrey,
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        context: context,
+                        builder: (context) => Container(
+                          margin: EdgeInsets.all(20),
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: ColorsManager.darkGrey,
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                ),
+                            itemCount: AvatarSeeds.avatars.length,
+                            itemBuilder: (context, index) => InkWell(
+                              onTap: () {
+                                viewModel.changeAvatarSeed(AvatarSeeds.avatars[index]);
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                margin: EdgeInsets.all(18),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: BoxBorder.all(
+                                    width: 3,
+                                    color: ColorsManager.yellow,
                                   ),
-                              itemCount: AvatarSeeds.avatars.length,
-                              itemBuilder: (context, index) => InkWell(
-                                onTap: () {
-                                  viewModel.changeAvatarSeed(AvatarSeeds.avatars[index]);
-                                  Navigator.pop(context);
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.all(18),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: BoxBorder.all(
-                                      width: 3,
-                                      color: ColorsManager.yellow,
-                                    ),
-                                  ),
-                                  child: ClipOval(
-                                    child: Image.network(
-                                      "https://api.dicebear.com/7.x/avataaars/png?seed=${AvatarSeeds.avatars[index]}",
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) => Icon(
-                                            Icons.person,
-                                            color: ColorsManager.yellow,
-                                            size: 36,
-                                          ),
-                                    ),
+                                ),
+                                child: ClipOval(
+                                  child: Image.network(
+                                    "https://api.dicebear.com/7.x/avataaars/png?seed=${AvatarSeeds.avatars[index]}",
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) => Icon(
+                                          Icons.person,
+                                          color: ColorsManager.yellow,
+                                          size: 36,
+                                        ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        );
-                      },
-                      child: SizedBox(
-                        width: 150,
-                        height: 150,
-                        child: CircleAvatar(
-                          child: Image.network(
-                            viewModel.getAvatarLink(viewModel.avatarSeed),
-                          ),
+                        ),
+                      );
+                    },
+                    child: SizedBox(
+                      width: 150,
+                      height: 150,
+                      child: CircleAvatar(
+                        child: Image.network(
+                          viewModel.getAvatarLink(viewModel.avatarSeed),
                         ),
                       ),
                     ),
-                    SizedBox(height: 16),
-                    Form(
-                      key: _formKey,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      child: Column(
-                        children: [
-                          CustomTextField(
-                            controller: _nameController,
-                            hint: "",
-                            prefixIcon: Icon(Icons.person),
+                  ),
+                  SizedBox(height: 16),
+                  Form(
+                    key: _formKey,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    child: Column(
+                      children: [
+                        CustomTextField(
+                          controller: _nameController,
+                          hint: "",
+                          prefixIcon: Icon(Icons.person),
+                        ),
+                        SizedBox(height: 20),
+                        CustomPhoneField(
+                            controller: _phoneController,
+                            hint: l10n.phone,
                           ),
-                          SizedBox(height: 20),
-                          CustomPhoneField(
-                              controller: _phoneController,
-                              hint: l10n.phone,
-                            ),
-                        ],
-                      ),
+                      ],
                     ),
+                  ),
 
-                    SizedBox(height: 20),
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: ColorsManager.darkGrey,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            l10n.language,
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                          Spacer(),
-                          LangSwitch(),
-                        ],
-                      ),
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: ColorsManager.darkGrey,
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    SizedBox(height: 15),
-                    Align(
-                      alignment: AlignmentGeometry.centerLeft,
-                      child: CustomTextButton(
-                        title: Text(
-                          l10n.resetPassword,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                    child: Row(
+                      children: [
+                        Text(
+                          l10n.language,
+                          style: Theme.of(context).textTheme.labelMedium,
                         ),
-                        onPressed: () {
-                          Navigator.pushNamed(
-                            context,
-                            RoutesManager.forgetPassword,
-                          );
-                        },
-                      ),
+                        Spacer(),
+                        LangSwitch(),
+                      ],
                     ),
-                    Spacer(),
-                    CustomElevatedButton(
+                  ),
+                  SizedBox(height: 15),
+                  Align(
+                    alignment: AlignmentGeometry.centerLeft,
+                    child: CustomTextButton(
                       title: Text(
-                        l10n.deleteAccount,
+                        l10n.resetPassword,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
-                      onPressed: viewModel.isLoading
-                          ? null
-                          : () async {
-                        final shouldDelete = await showDialog<bool>(
-                          context: context,
-                          builder: (dialogContext) => AlertDialog(
-                            title: const Text('Delete account?'),
-                            content: const Text(
-                              'This action cannot be undone. Are you sure you want to delete your account?',
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          RoutesManager.forgetPassword,
+                        );
+                      },
+                    ),
+                  ),
+                  Spacer(),
+                  CustomElevatedButton(
+                    title: Text(
+                      l10n.deleteAccount,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    onPressed: viewModel.isLoading
+                        ? null
+                        : () async {
+                      final shouldDelete = await showDialog<bool>(
+                        context: context,
+                        builder: (dialogContext) => AlertDialog(
+                          title: const Text('Delete account?'),
+                          content: const Text(
+                            'This action cannot be undone. Are you sure you want to delete your account?',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(dialogContext, false),
+                              child: const Text('Cancel'),
                             ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(dialogContext, false),
-                                child: const Text('Cancel'),
+                            TextButton(
+                              onPressed: () => Navigator.pop(dialogContext, true),
+                              child: const Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.red),
                               ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(dialogContext, true),
-                                child: const Text(
-                                  'Delete',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (shouldDelete != true || !context.mounted) return;
+
+                      final success = await viewModel.deleteAccount();
+
+                      if (!context.mounted) return;
+
+                      if (success) {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          RoutesManager.login,
+                              (route) => false,
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              viewModel.errorMessage ?? 'Account deletion failed.',
+                            ),
                           ),
                         );
-
-                        if (shouldDelete != true || !context.mounted) return;
-
-                        final success = await viewModel.deleteAccount();
-
-                        if (!context.mounted) return;
-
-                        if (success) {
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            RoutesManager.login,
-                                (route) => false,
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                viewModel.errorMessage ?? 'Account deletion failed.',
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      backgroundColor: ColorsManager.red,
+                      }
+                    },
+                    backgroundColor: ColorsManager.red,
+                  ),
+                  SizedBox(height: 19),
+                  CustomElevatedButton(
+                    title: Text(
+                      l10n.updateAccount,
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    SizedBox(height: 19),
-                    CustomElevatedButton(
-                      title: Text(
-                        l10n.updateAccount,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      onPressed: viewModel.isLoading
-                          ? null
-                          : () async {
-                        if (!_formKey.currentState!.validate()) return;
-                        final success = await viewModel.updateAccount(
-                          newName: _nameController.text.trim(),
-                          newPhone: _phoneController.value.international,
+                    onPressed: viewModel.isLoading
+                        ? null
+                        : () async {
+                      if (!_formKey.currentState!.validate()) return;
+                      final success = await viewModel.updateAccount(
+                        newName: _nameController.text.trim(),
+                        newPhone: _phoneController.value.international,
+                      );
+
+                      if (!context.mounted) return;
+
+                      if (success) {
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              viewModel.errorMessage ?? 'Could not update profile',
+                            ),
+                          ),
                         );
-              
-                        if (!context.mounted) return;
-              
-                        if (success) {
-                          Navigator.pop(context);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                viewModel.errorMessage ?? 'Could not update profile',
-                              ),
-                            ),
-                          );
-                        }
-                      },
-                      backgroundColor: ColorsManager.yellow,
-                    ),
-                  ],
-                ),
+                      }
+                    },
+                    backgroundColor: ColorsManager.yellow,
+                  ),
+                ],
               ),
             ),
           );

@@ -5,8 +5,7 @@ import 'package:movies_app/repos/update_profile_repo/update_profile_repo.dart';
 class UpdateProfileViewModel extends ChangeNotifier {
   final UpdateProfileRepo _updateProfileRepo;
 
-  UpdateProfileViewModel({required UpdateProfileRepo updateProfileRepo})
-    : _updateProfileRepo = updateProfileRepo {
+  UpdateProfileViewModel({required this._updateProfileRepo}) {
     final user = UserModel.loggedInUser!;
     name = user.name ?? '';
     phone = user.phone ?? '';
