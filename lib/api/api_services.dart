@@ -20,21 +20,17 @@ class ApiServices {
       if (serverResponse.statusCode == 200) {
         return jsonDecode(serverResponse.body) as Map<String, dynamic>;
       } else {
-        Utilities.showToast("Server error (${serverResponse.statusCode})");
+        Utilities.showToast("Failed to load data");
         return null;
       }
     } on SocketException {
-      Utilities.showToast("No internet connection");
-      return null;
+      throw Exception("No internet connection");
     } on TimeoutException {
-      Utilities.showToast("Request timed out");
-      return null;
+      throw Exception("Request timed out");
     } on FormatException {
-      Utilities.showToast("Invalid response format");
-      return null;
+      throw Exception("Invalid response format");
     } catch (e) {
-      Utilities.showToast("An unexpected error occurred");
-      return null;
+      throw Exception("An error occurred: $e");
     }
   }
 

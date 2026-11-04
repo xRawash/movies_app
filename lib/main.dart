@@ -68,7 +68,7 @@ class MoviesApp extends StatelessWidget {
       onGenerateRoute: RoutesManager.getRoute,
       theme: ThemeManager.light,
       darkTheme: ThemeManager.dark,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
     );
   }
 }

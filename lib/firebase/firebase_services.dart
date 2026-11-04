@@ -12,8 +12,7 @@ import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/models/user_model.dart';
 
 class FirebaseServices {
-  static CollectionReference<Map<String, dynamic>>
-  _getUsersCollectionReference() {
+  static CollectionReference<Map<String, dynamic>> _getUsersCollectionReference() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     return db.collection('users');
   }
@@ -38,15 +37,7 @@ class FirebaseServices {
     return data == null ? null : UserModel.fromJson(data);
   }
 
-  static void register(
-    String name,
-    String email,
-    String password,
-    String phoneNumber,
-    BuildContext context,
-    String avatarName,
-    GlobalKey<FormState> key,
-  ) async {
+  static void register(String name, String email, String password, String phoneNumber, BuildContext context, String avatarName, GlobalKey<FormState> key,) async {
     if (key.currentState!.validate() == false) return;
     var l10n = AppLocalizations.of(context)!;
     try {
@@ -59,7 +50,14 @@ class FirebaseServices {
         id: userCredential.user!.uid,
         avatarName: avatarName,
       );
-      await addUserToFirestore(user);
+      try {
+        await addUserToFirestore(user);
+      } catch (e) {
+        await FirebaseAuth.instance.currentUser!.delete();
+        Utilities.showToast(l10n.signUpFailed);
+        return;
+      }
+
       if (!context.mounted) {
         return null;
       }
@@ -89,12 +87,7 @@ class FirebaseServices {
     }
   }
 
-  static void login(
-    String email,
-    String password,
-    BuildContext context,
-    GlobalKey<FormState> key,
-  ) async {
+  static void login(String email, String password, BuildContext context, GlobalKey<FormState> key,) async {
     if (key.currentState!.validate() == false) return;
     var l10n = AppLocalizations.of(context)!;
     try {
@@ -194,10 +187,7 @@ class FirebaseServices {
     }
   }
 
-  static Future<UserCredential?> signUpWithGoogle(
-    String phoneNumber,
-    BuildContext context,
-  ) async {
+  static Future<UserCredential?> signUpWithGoogle(String phoneNumber, BuildContext context,) async {
     var l10n = AppLocalizations.of(context)!;
     try {
       GoogleSignInAccount googleUser = await GoogleSignIn.instance
@@ -219,8 +209,12 @@ class FirebaseServices {
           email: googleUser.email,
           phone: phoneNumber,
         );
-        await addUserToFirestore(user);
-        UserModel.loggedInUser = user;
+       try {
+          await addUserToFirestore(user);
+        } catch (e) {
+          await FirebaseAuth.instance.currentUser!.delete();
+          Utilities.showToast(l10n.signUpFailed);
+       }
         if (!context.mounted) return userCredential;
         Utilities.showToast(l10n.accountCreatedSuccessfully);
         Navigator.pushReplacementNamed(context, RoutesManager.login);
@@ -380,9 +374,9 @@ class FirebaseServices {
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    UserModel.loggedInUser!.wishListMovies!
-        .removeWhere((item) => item['id'] == movie.id);
     await userDocument.update(UserModel.loggedInUser!.toJson());
+    // UserModel.loggedInUser!.wishListMovies!
+    //     .removeWhere((item) => item['id'] == movie.id);
   }
 
   static Future<void> resetPassword(String email, BuildContext context) async {

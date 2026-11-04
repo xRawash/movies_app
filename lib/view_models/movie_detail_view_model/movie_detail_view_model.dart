@@ -19,7 +19,7 @@ class MovieDetailViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       final response = await _movieRepo.getMovieDetails(movieId);
-      if (response.status != "ok" && response.data?.movie == null) {
+      if (response.status != "ok" || response.data?.movie == null) {
         errorMessage = response.statusMessage;
         Utilities.showToast("Failed to load movie details");
       } else {

@@ -21,6 +21,7 @@ class BookmarkViewModel extends ChangeNotifier {
   String? errorMessage;
 
   Future<void> toggleBookmark(Movie movie) async {
+    final user = UserModel.loggedInUser;
     if (movie.id == null) return;
     isUpdating = true;
     errorMessage = null;
@@ -28,14 +29,17 @@ class BookmarkViewModel extends ChangeNotifier {
     try {
       if (isBookMarked(movie.id)) {
         await _bookmarkRepo.removeMovieFromWishList(movie);
+        user!.wishListMovies?.removeWhere((item) => item['id'] == movie.id);
       } else {
         await _bookmarkRepo.addMovieToWishList(movie);
+        user!.wishListMovies?.add(movie.toJson());
       }
     } catch (e) {
       errorMessage = e.toString();
       Utilities.showToast("Failed to update bookmark");
     } finally {
       isUpdating = false;
+      UserModel.loggedInUser = user;
       notifyListeners();
     }
   }
