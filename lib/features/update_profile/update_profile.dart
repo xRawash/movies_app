@@ -24,7 +24,6 @@ class UpdateProfile extends StatefulWidget {
 class _UpdateProfileState extends State<UpdateProfile> {
   late TextEditingController _nameController;
   late PhoneController _phoneController;
-  PhoneNumber? initialPhone;
   final _formKey = GlobalKey<FormState>();
 
 

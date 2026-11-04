@@ -305,20 +305,25 @@ class FirebaseServices {
     final firebaseUser = FirebaseAuth.instance.currentUser;
 
     if (firebaseUser == null) {
-      throw Exception('No authenticated user found.');
+      Utilities.showToast('No authenticated user found.');
     }
 
-    final userId = firebaseUser.uid;
+    final userId = firebaseUser!.uid;
     final userDocument = _getUsersCollectionReference().doc(userId);
 
     try {
-      await firebaseUser.delete();
-
       await userDocument.delete();
 
-      await GoogleSignIn.instance.signOut();
+      await firebaseUser.delete();
 
       UserModel.loggedInUser = null;
+
+      try {
+        await GoogleSignIn.instance.signOut();
+      } catch (e) {
+        Utilities.showToast('Error signing out from Google: $e');
+      }
+
     } on FirebaseAuthException {
       rethrow;
     } on FirebaseException {

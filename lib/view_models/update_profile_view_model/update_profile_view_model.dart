@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/repos/update_profile_repo/update_profile_repo.dart';
@@ -74,8 +75,15 @@ class UpdateProfileViewModel extends ChangeNotifier {
     try {
       await _updateProfileRepo.deleteAccount();
       return true;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        errorMessage = 'Please sign in again before deleting your account.';
+      } else {
+        errorMessage = e.message ?? 'Account deletion failed.';
+      }
+      return false;
     } catch (e) {
-      errorMessage = e.toString();
+      errorMessage = 'Something went wrong. Please try again.';
       return false;
     } finally {
       isLoading = false;
