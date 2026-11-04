@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movies_app/api/avatar_seeds/avatar_seeds.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
+import 'package:movies_app/core/validations/validations.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/core/widgets/custom_phone_field.dart';
 import 'package:movies_app/core/widgets/custom_text_button.dart';
@@ -144,6 +145,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     child: Column(
                       children: [
                         CustomTextField(
+                          validation: (value) {
+                            return Validations.validateName(value);
+                          },
                           controller: _nameController,
                           hint: "",
                           prefixIcon: Icon(Icons.person),
