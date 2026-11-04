@@ -43,8 +43,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
     if (user.phone != null && user.phone!.isNotEmpty) {
       try {
         parsedPhone = PhoneNumber.parse(user.phone!);
-      } catch (_) {
+
+      } catch (e) {
+
         parsedPhone = null;
+
       }
     }
 
@@ -207,14 +210,15 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       final shouldDelete = await showDialog<bool>(
                         context: context,
                         builder: (dialogContext) => AlertDialog(
-                          title: const Text('Delete account?'),
+                          backgroundColor: ColorsManager.darkGrey,
+                          title: const Text('Delete account?', style: TextStyle(color: Colors.white)),
                           content: const Text(
                             'This action cannot be undone. Are you sure you want to delete your account?',
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(dialogContext, false),
-                              child: const Text('Cancel'),
+                              child: const Text('Cancel', style: TextStyle(color: Colors.white)),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(dialogContext, true),
@@ -224,6 +228,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                               ),
                             ),
                           ],
+                          actionsPadding: EdgeInsets.all(16),
                         ),
                       );
 
@@ -260,6 +265,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     onPressed: viewModel.isLoading
                         ? null
                         : () async {
+
                       if (!_formKey.currentState!.validate()) return;
                       final success = await viewModel.updateAccount(
                         newName: _nameController.text.trim(),

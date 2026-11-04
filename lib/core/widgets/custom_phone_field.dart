@@ -47,11 +47,17 @@ class CustomPhoneField extends StatelessWidget {
           borderSide: BorderSide(color: Colors.red),
         ),
       ),
-      validator: validator ??
-          PhoneValidator.compose([
-            PhoneValidator.required(context),
-            PhoneValidator.valid(context),
-          ]),
+        validator: (phone) {
+      if (phone == null || phone.nsn.isEmpty) {
+        return 'Required';
+      }
+      return PhoneValidator.valid(context)(phone);
+    },
+      // validator: validator ??
+      //     PhoneValidator.compose([
+      //       PhoneValidator.required(context),
+      //       PhoneValidator.valid(context),
+      //     ]),
     );
   }
 }
