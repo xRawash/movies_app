@@ -16,7 +16,7 @@ class UpdateProfileRepo {
     );
   }
 
-  Future<void> deleteAccount(BuildContext context) async {
-    await FirebaseServices.deleteAccount(context);
+  Future<void> deleteAccount() async {
+    await FirebaseServices.deleteAccount();
   }
 }

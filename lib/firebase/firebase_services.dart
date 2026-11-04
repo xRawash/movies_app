@@ -300,43 +300,29 @@ class FirebaseServices {
     }
   }
 
-  static Future<void> deleteAccount(BuildContext context) async {
-    var l10n = AppLocalizations.of(context)!;
-    CollectionReference<Map<String, dynamic>> usersCollection =
-        _getUsersCollectionReference();
-    DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
-      UserModel.loggedInUser!.id,
-    );
-    try {
-      final result = await InternetAddress.lookup('google.com')
-          .timeout(const Duration(seconds: 3));
-      if (result.isEmpty || result[0].rawAddress.isEmpty) {
-        Utilities.showToast(l10n.networkError);
-        return;
-      }
-    } catch (_) {
-      Utilities.showToast(l10n.networkError);
-      return;
+
+  static Future<void> deleteAccount() async {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+
+    if (firebaseUser == null) {
+      throw Exception('No authenticated user found.');
     }
+
+    final userId = firebaseUser.uid;
+    final userDocument = _getUsersCollectionReference().doc(userId);
+
     try {
-      await FirebaseAuth.instance.currentUser!.delete();
+      await firebaseUser.delete();
+
       await userDocument.delete();
-      await FirebaseAuth.instance.signOut();
+
       await GoogleSignIn.instance.signOut();
+
       UserModel.loggedInUser = null;
-      if (!context.mounted) return;
-      Utilities.showToast(l10n.accountDeletedSuccessfully);
-      Navigator.pushReplacementNamed(context, RoutesManager.login);
-    } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'network-request-failed':
-          Utilities.showToast(l10n.networkError);
-          break;
-        default:
-          Utilities.showToast(l10n.accountDeletionFailed);
-      }
-    } catch (e) {
-      Utilities.showToast(l10n.accountDeletionFailed);
+    } on FirebaseAuthException {
+      rethrow;
+    } on FirebaseException {
+      rethrow;
     }
   }
 

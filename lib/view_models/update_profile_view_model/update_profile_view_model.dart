@@ -64,17 +64,20 @@ class UpdateProfileViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteAccount(BuildContext context) async {
-    if (isLoading) return;
+
+  Future<bool> deleteAccount() async {
+    if (isLoading) return false;
 
     isLoading = true;
     errorMessage = null;
     notifyListeners();
 
     try {
-      await _updateProfileRepo.deleteAccount(context);
+      await _updateProfileRepo.deleteAccount();
+      return true;
     } catch (e) {
       errorMessage = e.toString();
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();

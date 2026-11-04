@@ -198,10 +198,53 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         l10n.deleteAccount,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
-                      onPressed: viewModel.isLoading ? null : () async {
-                        await context
-                            .read<UpdateProfileViewModel>()
-                            .deleteAccount(context);
+                      onPressed: viewModel.isLoading
+                          ? null
+                          : () async {
+                        final shouldDelete = await showDialog<bool>(
+                          context: context,
+                          builder: (dialogContext) => AlertDialog(
+                            title: const Text('Delete account?'),
+                            content: const Text(
+                              'This action cannot be undone. Are you sure you want to delete your account?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(dialogContext, false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(dialogContext, true),
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (shouldDelete != true || !context.mounted) return;
+
+                        final success = await viewModel.deleteAccount();
+
+                        if (!context.mounted) return;
+
+                        if (success) {
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            RoutesManager.login,
+                                (route) => false,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                viewModel.errorMessage ?? 'Account deletion failed.',
+                              ),
+                            ),
+                          );
+                        }
                       },
                       backgroundColor: ColorsManager.red,
                     ),
