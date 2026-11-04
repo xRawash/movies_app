@@ -3,7 +3,7 @@ class Validations {
     if(name == null || name.trim().isEmpty){
       return "Name is required";
     }
-    if(name.length < 8){
+    if(name.trim().length < 8){
       return "Sorry, name should be at least 8 chars";
     }
     if (!name.trim().contains(" ")){

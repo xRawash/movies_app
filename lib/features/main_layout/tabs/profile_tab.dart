@@ -58,6 +58,7 @@ class _ProfileTabState extends State<ProfileTab> {
                                     child: CircleAvatar(
                                       child: Image.network(
                                         viewModel.getAvatarLink() ?? "",
+                                        errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
                                       ),
                                     ),
                                   ),

@@ -21,7 +21,7 @@ class CustomTextField extends StatefulWidget {
   final bool obscureText;
   final String? Function(String?)? validation;
   final TextInputType? textInputType;
-  final String? Function(String?)? onChanged;
+  final ValueChanged<String>? Function(String?)? onChanged;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();

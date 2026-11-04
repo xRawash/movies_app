@@ -334,7 +334,7 @@ class FirebaseServices {
       {
         'name': name,
         'phone': phone,
-        'avatarName': avatarSeed,
+        'avatar': avatarSeed,
       },
     );
   }
@@ -370,7 +370,8 @@ class FirebaseServices {
         _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
-    );UserModel.loggedInUser!.wishListMovies!
+    );
+    UserModel.loggedInUser!.wishListMovies!
         .removeWhere((item) => item['id'] == movie.id);
     await userDocument.update(UserModel.loggedInUser!.toJson());
 
