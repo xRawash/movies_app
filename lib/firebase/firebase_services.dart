@@ -340,15 +340,24 @@ class FirebaseServices {
   }
 
   static Future<void> addMovieToWishList(Movie movie) async {
+    final user = UserModel.loggedInUser;
+    final currentList = user!.wishListMovies ?? [];
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
+    final updatedList = [...currentList, movie.toJson()];
     bool exists = UserModel.loggedInUser!.wishListMovies!
         .any((item) => item['id'] == movie.id);
+
     if (!exists) {
-      await userDocument.update(UserModel.loggedInUser!.toJson());
+      await userDocument.update({
+        'watchList': updatedList,
+      });
+      user.wishListMovies = updatedList;
+    } else {
+      return;
     }
   }
 
@@ -358,22 +367,32 @@ class FirebaseServices {
     DocumentReference<Map<String, dynamic>> userDox = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
+    final currentList = UserModel.loggedInUser!.watchedMovies ?? [];
+    final updatedList = [...currentList, movie.toJson()];
+
     bool exists = UserModel.loggedInUser!.watchedMovies!
         .any((item) => item['id'] == movie.id);
     if (!exists) {
-      await userDox.update(UserModel.loggedInUser!.toJson());
+      await userDox.update({
+        'history' : updatedList
+      });
+      UserModel.loggedInUser!.watchedMovies = updatedList;
     }
   }
 
   static Future<void> removeMovieFromWishList(Movie movie) async {
+    final user = UserModel.loggedInUser;
+    final currentList = user!.wishListMovies ?? [];
+    final updatedList = currentList.where((item) => item['id'] != movie.id).toList();
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    UserModel.loggedInUser!.wishListMovies!
-        .removeWhere((item) => item['id'] == movie.id);
-    await userDocument.update(UserModel.loggedInUser!.toJson());
+    await userDocument.update({
+      'watchList': updatedList,
+    });
+    user.wishListMovies = updatedList;
 
   }
 
