@@ -75,6 +75,7 @@ class SearchViewModel extends ChangeNotifier{
   @override
   void dispose() {
     _debounce?.cancel();
+    _requestId++;
     super.dispose();
   }
 }

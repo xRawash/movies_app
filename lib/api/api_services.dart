@@ -20,8 +20,7 @@ class ApiServices {
       if (serverResponse.statusCode == 200) {
         return jsonDecode(serverResponse.body) as Map<String, dynamic>;
       } else {
-        Utilities.showToast("Failed to load data");
-        return null;
+       throw Exception("Failed to load data");
       }
     } on SocketException {
       throw Exception("No internet connection");

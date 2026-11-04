@@ -211,12 +211,15 @@ class FirebaseServices {
         );
        try {
           await addUserToFirestore(user);
+
         } catch (e) {
           await FirebaseAuth.instance.currentUser!.delete();
           Utilities.showToast(l10n.signUpFailed);
+          return null;
        }
         if (!context.mounted) return userCredential;
         Utilities.showToast(l10n.accountCreatedSuccessfully);
+        UserModel.loggedInUser = user;
         Navigator.pushReplacementNamed(context, RoutesManager.login);
       } else {
         UserModel.loggedInUser = existing;
@@ -261,18 +264,6 @@ class FirebaseServices {
 
   static Future<bool> signOut(BuildContext context) async {
     var l10n = AppLocalizations.of(context)!;
-    try {
-      final result = await InternetAddress.lookup('google.com')
-          .timeout(const Duration(seconds: 3));
-      if (result.isEmpty || result[0].rawAddress.isEmpty) {
-        Utilities.showToast(l10n.networkError);
-        return false;
-      }
-    } catch (_) {
-      Utilities.showToast(l10n.networkError);
-      return false;
-    }
-
     try {
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn.instance.signOut();
@@ -375,8 +366,8 @@ class FirebaseServices {
       UserModel.loggedInUser!.id,
     );
     await userDocument.update(UserModel.loggedInUser!.toJson());
-    // UserModel.loggedInUser!.wishListMovies!
-    //     .removeWhere((item) => item['id'] == movie.id);
+    UserModel.loggedInUser!.wishListMovies!
+        .removeWhere((item) => item['id'] == movie.id);
   }
 
   static Future<void> resetPassword(String email, BuildContext context) async {
