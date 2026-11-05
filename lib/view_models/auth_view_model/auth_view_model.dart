@@ -34,7 +34,7 @@ class AuthViewModel extends ChangeNotifier {
     try {
       return await _authRepo.loginWithGoogle();
     } catch (e) {
-      errorMessage = e.toString().substring(11);
+      errorMessage = e.toString();
     } finally {
       isLoading = false;
       notifyListeners();
@@ -60,7 +60,7 @@ class AuthViewModel extends ChangeNotifier {
       );
       return true;
     } catch (e) {
-      errorMessage = e.toString().substring(11);
+      errorMessage = e.toString();
       return false;
     } finally {
       isLoading = false;
@@ -76,7 +76,7 @@ class AuthViewModel extends ChangeNotifier {
     try {
       return await _authRepo.signUpWithGoogle(phoneNumber,);
     } catch (e) {
-      errorMessage = e.toString().substring(11);
+      errorMessage = e.toString();
     } finally {
       isLoading = false;
       notifyListeners();
@@ -92,7 +92,7 @@ class AuthViewModel extends ChangeNotifier {
       await _authRepo.resetPassword( email,);
       return true;
     } catch (e) {
-      errorMessage = e.toString().substring(11);
+      errorMessage = e.toString();
       return false;
     } finally {
       isLoading = false;
