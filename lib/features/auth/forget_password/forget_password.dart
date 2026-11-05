@@ -19,6 +19,8 @@ class ForgetPassword extends StatefulWidget {
 
 class _ForgetPasswordState extends State<ForgetPassword> {
   late TextEditingController _emailController;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
 
   @override
   void initState() {
@@ -42,40 +44,44 @@ class _ForgetPasswordState extends State<ForgetPassword> {
         create: (_) => AuthViewModel(authRepo: AuthRepoImpl()),
         child: Consumer<AuthViewModel>(
           builder: (context, viewModel, child) => SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Image(image: AssetImage(ImageAssets.forgetPassword)),
-                  SizedBox(height: 24),
-                  CustomTextField(
-                    controller: _emailController,
-                    validation: Validations.validateEmail,
-                    hint: l10n.email,
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                  SizedBox(height: 40),
-                  CustomElevatedButton(
-                    title: viewModel.isLoading ? CircularProgressIndicator() : Text(
-                      l10n.verifyEmail,
-                      style: Theme.of(context).textTheme.titleMedium!
-                          .copyWith(fontWeight: FontWeight.normal),
+            child: Form(
+              key: _formKey ,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Image(image: AssetImage(ImageAssets.forgetPassword)),
+                    SizedBox(height: 24),
+                    CustomTextField(
+                      controller: _emailController,
+                      validation: Validations.validateEmail,
+                      hint: l10n.email,
+                      prefixIcon: Icon(Icons.email),
                     ),
-                    onPressed: viewModel.isLoading? null : () async {
-                      bool succeeded = await viewModel.resetPassword(_emailController.text.trim(),);
-                      if (viewModel.errorMessage != null) {
-                        Utilities.showToast(viewModel.errorMessage!);
-                      }
-                      if(succeeded) {
-                        if (!context.mounted) return;
-                        Utilities.showToast("Email sent successfully");
-                        Navigator.pop(context);
-                      }
-                    },
-                    backgroundColor: ColorsManager.yellow,
-                  ),
-                ],
+                    SizedBox(height: 40),
+                    CustomElevatedButton(
+                      title: viewModel.isLoading ? CircularProgressIndicator() : Text(
+                        l10n.verifyEmail,
+                        style: Theme.of(context).textTheme.titleMedium!
+                            .copyWith(fontWeight: FontWeight.normal),
+                      ),
+                      onPressed: viewModel.isLoading? null : () async {
+                        if(_formKey.currentState!.validate() == false) return;
+                        bool succeeded = await viewModel.resetPassword(_emailController.text.trim(),);
+                        if (viewModel.errorMessage != null) {
+                          Utilities.showToast(viewModel.errorMessage!);
+                        }
+                        if(succeeded) {
+                          if (!context.mounted) return;
+                          Utilities.showToast("Email sent successfully");
+                          Navigator.pop(context);
+                        }
+                      },
+                      backgroundColor: ColorsManager.yellow,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

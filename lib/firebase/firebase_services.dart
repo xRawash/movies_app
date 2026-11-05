@@ -179,6 +179,7 @@ class FirebaseServices {
 
         } catch (e) {
           await FirebaseAuth.instance.currentUser!.delete();
+          await GoogleSignIn.instance.signOut();
           throw Exception('Error signing up with Google: $e');
        }
 
