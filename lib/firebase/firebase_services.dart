@@ -36,7 +36,7 @@ class FirebaseServices {
     return data == null ? null : UserModel.fromJson(data);
   }
 
-  static void register(String name, String email, String password, String phoneNumber, BuildContext context, String avatarName, GlobalKey<FormState> key,) async {
+  static Future<void> register(String name, String email, String password, String phoneNumber, BuildContext context, String avatarName, GlobalKey<FormState> key,) async {
     if (key.currentState!.validate() == false) return;
     var l10n = AppLocalizations.of(context)!;
     try {
@@ -53,40 +53,35 @@ class FirebaseServices {
         await addUserToFirestore(user);
       } catch (e) {
         await FirebaseAuth.instance.currentUser!.delete();
-        Utilities.showToast(l10n.signUpFailed);
-        return;
+       throw Exception('Error registering user: $e');
       }
 
       if (!context.mounted) {
-        return null;
+        return;
       }
       Utilities.showToast(l10n.accountCreatedSuccessfully);
       Navigator.pushReplacementNamed(context, RoutesManager.login);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':
-          Utilities.showToast(l10n.emailAlreadyInUse);
-          break;
+          throw Exception('Email already in use');
         case 'weak-password':
-          Utilities.showToast(l10n.weakPassword);
-          break;
+          throw Exception('Weak password');
         case 'invalid-email':
-          Utilities.showToast(l10n.invalidEmail);
-          break;
+          throw Exception('Invalid email');
         case 'network-request-failed':
-          Utilities.showToast(l10n.networkError);
-          break;
+          throw Exception('Network request failed');
         default:
-          Utilities.showToast(l10n.signUpFailed);
+          throw Exception('Registration failed: $e');
       }
-    } on FirebaseException {
-      Utilities.showToast(l10n.signUpFailed);
+    } on FirebaseException catch (e) {
+      throw Exception('Registration failed: $e');
     } catch (e) {
-      Utilities.showToast(l10n.somethingWentWrong);
+      throw Exception('Registration failed: $e');
     }
   }
 
-  static void login(String email, String password, BuildContext context, GlobalKey<FormState> key,) async {
+  static Future<void> login(String email, String password, BuildContext context, GlobalKey<FormState> key,) async {
     if (key.currentState!.validate() == false) return;
     var l10n = AppLocalizations.of(context)!;
     try {
@@ -100,33 +95,33 @@ class FirebaseServices {
       }
       UserModel.loggedInUser = user;
       if (!context.mounted) {
-        return null;
+        return;
       }
       Utilities.showToast(l10n.loggedInSuccessfully);
       Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'invalid-credential':
+          throw Exception('invalid-credential');
         case 'user-not-found':
+          throw Exception('user-not-found');
         case 'wrong-password':
-          Utilities.showToast(l10n.wrongEmailOrPassword);
-          break;
+         throw Exception(l10n.loginFailed);
         case 'user-disabled':
-          Utilities.showToast(l10n.accountDisabled);
-          break;
+          throw Exception('user-disabled');
         case 'too-many-requests':
-          Utilities.showToast(l10n.tooManyAttempts);
-          break;
+          throw Exception('too-many-requests');
         case 'network-request-failed':
-          Utilities.showToast(l10n.networkError);
-          break;
+          throw Exception('network-request-failed');
+        case 'invalid-email':
+          throw Exception('invalid-email');
         default:
-          Utilities.showToast(l10n.loginFailed);
+          throw Exception('Login failed : ${e.code}');
       }
-    } on FirebaseException {
-      Utilities.showToast(l10n.couldNotLoadProfile);
+    } on FirebaseException catch (e){
+      throw Exception('Login failed: $e');
     } catch (e) {
-      Utilities.showToast(l10n.somethingWentWrong);
+      throw Exception('Login failed: $e');
     }
   }
 
@@ -145,8 +140,7 @@ class FirebaseServices {
       if (user == null) {
         await FirebaseAuth.instance.signOut();
         await GoogleSignIn.instance.signOut();
-        Utilities.showToast(l10n.noAccountFound);
-        return null;
+        throw Exception(l10n.noProfileFound);
       }
       UserModel.loggedInUser = user;
       if (!context.mounted) return userCredential;
@@ -156,33 +150,25 @@ class FirebaseServices {
     } on GoogleSignInException catch (e) {
       switch (e.code) {
         case GoogleSignInExceptionCode.canceled:
-          Utilities.showToast(l10n.signInCancelled);
-          break;
+          throw Exception(l10n.signInCancelled);
         default:
-          Utilities.showToast(l10n.googleSignInFailed);
+          throw Exception(l10n.googleSignInFailed);
       }
-      return null;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          Utilities.showToast(l10n.accountExistsDifferentCredential);
-          break;
+        throw Exception('account-exists-with-different-credential');
         case 'invalid-credential':
-          Utilities.showToast(l10n.invalidGoogleCredential);
-          break;
+         throw Exception('invalid-credential');
         case 'user-disabled':
-          Utilities.showToast(l10n.accountDisabled);
-          break;
+          throw Exception('user-disabled');
         case 'network-request-failed':
-          Utilities.showToast(l10n.networkError);
-          break;
+         throw Exception('network-request-failed');
         default:
-          Utilities.showToast(l10n.signInCancelled);
+          throw Exception('Login failed : ${e.code}');
       }
-      return null;
     } catch (e) {
-      Utilities.showToast(l10n.googleSignInFailed);
-      return null;
+      throw Exception(e);
     }
   }
 
@@ -213,8 +199,7 @@ class FirebaseServices {
 
         } catch (e) {
           await FirebaseAuth.instance.currentUser!.delete();
-          Utilities.showToast(l10n.signUpFailed);
-          return null;
+          throw Exception('Error signing up with Google: $e');
        }
         if (!context.mounted) return userCredential;
         Utilities.showToast(l10n.accountCreatedSuccessfully);
@@ -228,36 +213,28 @@ class FirebaseServices {
       }
       return userCredential;
     } on GoogleSignInException catch (e) {
-      debugPrint('GoogleSignInException: ${e.code} | ${e.description}');
       switch (e.code) {
         case GoogleSignInExceptionCode.canceled:
-          Utilities.showToast(l10n.signUpCancelled);
-          break;
+          throw Exception('Google sign-in canceled');
         default:
-          Utilities.showToast(l10n.googleSignInFailed);
+         throw Exception('Google sign-in failed');
       }
-      return null;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          Utilities.showToast(l10n.accountExistsDifferentCredential);
-          break;
+          throw Exception('Account exists with different credential');
         case 'invalid-credential':
-          Utilities.showToast(l10n.invalidGoogleCredential);
-          break;
+         throw Exception('Invalid credential');
         case 'user-disabled':
-          Utilities.showToast(l10n.accountDisabled);
-          break;
+         throw Exception('User disabled');
         case 'network-request-failed':
-          Utilities.showToast(l10n.networkError);
-          break;
+          throw Exception('Network request failed');
         default:
           Utilities.showToast(l10n.googleSignInFailed);
       }
       return null;
     } catch (e) {
-      Utilities.showToast(l10n.somethingWentWrong);
-      return null;
+      throw Exception('Error signing up with Google: $e');
     }
   }
 
@@ -405,19 +382,16 @@ class FirebaseServices {
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'invalid-email':
-          Utilities.showToast(l10n.invalidEmail);
-          break;
+          throw Exception(l10n.invalidEmail);
         case 'user-not-found':
-          Utilities.showToast(l10n.noUserFoundWithEmail);
-          break;
+          throw Exception('user-not-found');
         case 'network-request-failed':
-          Utilities.showToast(l10n.networkError);
-          break;
+          throw Exception(l10n.networkError);
         default:
-          Utilities.showToast(l10n.passwordResetFailed);
+          throw Exception(l10n.passwordResetFailed);
       }
     } catch (e) {
-      Utilities.showToast(l10n.passwordResetFailed);
+      throw Exception(l10n.passwordResetFailed);
     }
   }
 }

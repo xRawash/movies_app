@@ -11,7 +11,7 @@ import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/prefs_manager/prefs_manager.dart';
 import 'package:movies_app/provider/config_provider.dart';
-import 'package:movies_app/repos/bookmark_repo/bookmark_repo.dart';
+import 'package:movies_app/repos/bookmark_repo/bookmark_repo_impl.dart';
 import 'package:movies_app/view_models/bookmark_view_model/bookmark_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -36,7 +36,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ConfigProvider()),
-        ChangeNotifierProvider(create: (context) => BookmarkViewModel(bookmarkRepo: BookmarkRepo())),
+        ChangeNotifierProvider(create: (context) => BookmarkViewModel(bookmarkRepo: BookmarkRepoImpl())),
       ],
       child: const MoviesApp(),
     ),

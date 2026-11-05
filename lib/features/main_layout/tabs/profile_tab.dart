@@ -6,7 +6,7 @@ import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
-import 'package:movies_app/repos/profile_repo/profile_repo.dart';
+import 'package:movies_app/repos/profile_repo/profile_repo_impl.dart';
 import 'package:movies_app/view_models/profile_view_model/profile_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +24,7 @@ class _ProfileTabState extends State<ProfileTab> {
     var l10n = AppLocalizations.of(context)!;
 
     return ChangeNotifierProvider(
-      create: (_) => ProfileViewModel(profileRepo: ProfileRepo()),
+      create: (_) => ProfileViewModel(profileRepo: ProfileRepoImpl()),
       child: Consumer<ProfileViewModel>(
         builder: (context, viewModel, child) {
           if(viewModel.isLoading == true) {

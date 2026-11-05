@@ -9,6 +9,7 @@ import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 import 'package:movies_app/features/main_layout/widgets/genre_section.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/repos/movie_repo/movie_repo.dart';
+import 'package:movies_app/repos/movie_repo/movie_repo_impl.dart';
 import 'package:movies_app/view_models/home_view_model/home_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -46,7 +47,7 @@ class _HomeTabState extends State<HomeTab> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) =>
-      HomeViewModel(movieRepo: MovieRepo())
+      HomeViewModel(movieRepo: MovieRepoImpl())
         ..loadMovies(),
       child: Consumer<HomeViewModel>(
         builder: (context, viewModel, child) {

@@ -3,6 +3,7 @@ import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/repos/movie_repo/movie_repo.dart';
+import 'package:movies_app/repos/movie_repo/movie_repo_impl.dart';
 import 'package:movies_app/view_models/genre_view_model/genre_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -27,7 +28,7 @@ class MoviesByGenres extends StatelessWidget {
         ),
       ),
       body: ChangeNotifierProvider(
-        create: (_) => GenreViewModel(movieRepo: MovieRepo())..loadMoviesByGenre(genreId),
+        create: (_) => GenreViewModel(movieRepo: MovieRepoImpl())..loadMoviesByGenre(genreId),
         child: Consumer<GenreViewModel>(
           builder: (context, viewModel, child) {
             if (viewModel.errorMessage != null && viewModel.movies.isEmpty) {

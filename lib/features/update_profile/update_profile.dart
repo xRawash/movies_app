@@ -10,7 +10,7 @@ import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/core/widgets/lang_switch.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/models/user_model.dart';
-import 'package:movies_app/repos/update_profile_repo/update_profile_repo.dart';
+import 'package:movies_app/repos/update_profile_repo/update_profile_repo_impl.dart';
 import 'package:movies_app/view_models/update_profile_view_model/update_profile_view_model.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:provider/provider.dart';
@@ -70,7 +70,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
     var l10n = AppLocalizations.of(context)!;
     return ChangeNotifierProvider(
       create: (_) =>
-          UpdateProfileViewModel(updateProfileRepo: UpdateProfileRepo()),
+          UpdateProfileViewModel(updateProfileRepo: UpdateProfileRepoImpl()),
       child: Consumer<UpdateProfileViewModel>(
         builder: (context, viewModel, child) {
           return Scaffold(
@@ -215,6 +215,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           content: const Text(
                             'This action cannot be undone. Are you sure you want to delete your account?',
                           ),
+                          actionsAlignment: MainAxisAlignment.spaceBetween,
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(dialogContext, false),

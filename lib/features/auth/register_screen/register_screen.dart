@@ -12,7 +12,10 @@ import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/core/widgets/lang_switch.dart';
 import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
+import 'package:movies_app/repos/auth_repo/auth_repo_impl.dart';
+import 'package:movies_app/view_models/auth_view_model/auth_view_model.dart';
 import 'package:phone_form_field/phone_form_field.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -63,211 +66,223 @@ class _RegisterScreenState extends State<RegisterScreen> {
     var l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.register)),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                height: 90,
-                child: PageView.builder(
-                  controller: _pageController,
-                  physics: BouncingScrollPhysics(),
-                  itemCount: avatarSeeds.length,
-                  onPageChanged: (index) {
-                    setState(() {
-                      selectedAvatarSeed = avatarSeeds[index];
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    final seed = avatarSeeds[index];
-                    final isSelected = seed == selectedAvatarSeed;
-                    return AnimatedBuilder(
-                      animation: _pageController,
-                      builder: (context, child) {
-                        double value = 1.0;
-                        if (_pageController.position.haveDimensions) {
-                          value = _pageController.page! - index;
-                          value = (1 - (value.abs() * 0.25)).clamp(0.75, 1.0);
-                        }
-                        return Center(
-                          child: Transform.scale(scale: value, child: child),
-                        );
+      body: ChangeNotifierProvider(
+        create: (_) => AuthViewModel(authRepo: AuthRepoImpl()),
+        child: Consumer<AuthViewModel>(
+          builder: (context, viewModel, child) => Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    height: 90,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      physics: BouncingScrollPhysics(),
+                      itemCount: avatarSeeds.length,
+                      onPageChanged: (index) {
+                        setState(() {
+                          selectedAvatarSeed = avatarSeeds[index];
+                        });
                       },
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected
-                                ? ColorsManager.yellow
-                                : Colors.transparent,
-                            width: 3,
-                          ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: ColorsManager.yellow.withValues(
-                                      alpha: 0.4,
-                                    ),
-                                    blurRadius: 8,
-                                    spreadRadius: 2,
-                                  ),
-                                ]
-                              : [],
-                        ),
-                        child: ClipOval(
-                          child: Image.network(
-                            'https://api.dicebear.com/7.x/avataaars/png?seed=$seed',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                              Icons.person,
-                              color: ColorsManager.yellow,
-                              size: 36,
+                      itemBuilder: (context, index) {
+                        final seed = avatarSeeds[index];
+                        final isSelected = seed == selectedAvatarSeed;
+                        return AnimatedBuilder(
+                          animation: _pageController,
+                          builder: (context, child) {
+                            double value = 1.0;
+                            if (_pageController.position.haveDimensions) {
+                              value = _pageController.page! - index;
+                              value = (1 - (value.abs() * 0.25)).clamp(0.75, 1.0);
+                            }
+                            return Center(
+                              child: Transform.scale(scale: value, child: child),
+                            );
+                          },
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected
+                                    ? ColorsManager.yellow
+                                    : Colors.transparent,
+                                width: 3,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: ColorsManager.yellow.withValues(
+                                          alpha: 0.4,
+                                        ),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
+                                      ),
+                                    ]
+                                  : [],
+                            ),
+                            child: ClipOval(
+                              child: Image.network(
+                                'https://api.dicebear.com/7.x/avataaars/png?seed=$seed',
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => Icon(
+                                  Icons.person,
+                                  color: ColorsManager.yellow,
+                                  size: 36,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                "Swipe to choose your avatar",
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.displaySmall
-                    ?.copyWith(color: Colors.white, fontSize: 14),
-              ),
-              SizedBox(height: 16),
-              CustomTextField(
-                controller: _nameController,
-                validation: Validations.validateName,
-                hint: l10n.name,
-                prefixIcon: Icon(Icons.perm_identity_outlined),
-              ),
-              SizedBox(height: 23),
-              CustomTextField(
-                controller: _emailController,
-                validation: Validations.validateEmail,
-                hint: l10n.email,
-                prefixIcon: Icon(Icons.email),
-              ),
-              SizedBox(height: 23),
-              CustomTextField(
-                controller: _passwordController,
-                validation: Validations.validatePassword,
-                obscureText: isObscured,
-                hint: l10n.password,
-                prefixIcon: Icon(Icons.lock),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isObscured = !isObscured;
-                    });
-                  },
-                  icon: Icon(
-                    isObscured ? Icons.visibility_off : Icons.visibility,
-                  ),
-                ),
-              ),
-              SizedBox(height: 16),
-              CustomTextField(
-                controller: _passwordConfirmController,
-                validation: (value) => Validations.validatePasswordConfirmation(
-                  value,
-                  _passwordController.text,
-                ),
-                obscureText: isObscured,
-                hint: l10n.confirmPassword,
-                prefixIcon: Icon(Icons.lock),
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isObscured = !isObscured;
-                    });
-                  },
-                  icon: Icon(
-                    isObscured ? Icons.visibility_off : Icons.visibility,
-                  ),
-                ),
-              ),
-              SizedBox(height: 16),
-              CustomPhoneField(controller: _phoneNumberController),
-              SizedBox(height: 16),
-              CustomElevatedButton(
-                title: Text(
-                  l10n.createAccount,
-                  style: Theme.of(context).textTheme.titleMedium!
-                      .copyWith(fontWeight: FontWeight.normal),
-                ),
-                onPressed: () {
-                  final phoneStr = _phoneNumberController.value.international;
-                  FirebaseServices.register(
-                    _nameController.text.trim(),
-                    _emailController.text.trim(),
-                    _passwordController.text,
-                    phoneStr,
-                    context,
-                    selectedAvatarSeed,
-                    _formKey,
-                  );
-                },
-                backgroundColor: ColorsManager.yellow,
-              ),
-              SizedBox(height: 23),
-              CustomElevatedButton(
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ImageIcon(
-                      AssetImage(ImageAssets.googleLogo),
-                      color: ColorsManager.black,
+                        );
+                      },
                     ),
-                    SizedBox(width: 8),
-                    Text(
-                      l10n.signUpWithGoogle,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Swipe to choose your avatar",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.displaySmall
+                        ?.copyWith(color: Colors.white, fontSize: 14),
+                  ),
+                  SizedBox(height: 16),
+                  CustomTextField(
+                    controller: _nameController,
+                    validation: Validations.validateName,
+                    hint: l10n.name,
+                    prefixIcon: Icon(Icons.perm_identity_outlined),
+                  ),
+                  SizedBox(height: 23),
+                  CustomTextField(
+                    controller: _emailController,
+                    validation: Validations.validateEmail,
+                    hint: l10n.email,
+                    prefixIcon: Icon(Icons.email),
+                  ),
+                  SizedBox(height: 23),
+                  CustomTextField(
+                    controller: _passwordController,
+                    validation: Validations.validatePassword,
+                    obscureText: isObscured,
+                    hint: l10n.password,
+                    prefixIcon: Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isObscured = !isObscured;
+                        });
+                      },
+                      icon: Icon(
+                        isObscured ? Icons.visibility_off : Icons.visibility,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  CustomTextField(
+                    controller: _passwordConfirmController,
+                    validation: (value) => Validations.validatePasswordConfirmation(
+                      value,
+                      _passwordController.text,
+                    ),
+                    obscureText: isObscured,
+                    hint: l10n.confirmPassword,
+                    prefixIcon: Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isObscured = !isObscured;
+                        });
+                      },
+                      icon: Icon(
+                        isObscured ? Icons.visibility_off : Icons.visibility,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  CustomPhoneField(controller: _phoneNumberController),
+                  SizedBox(height: 16),
+                  CustomElevatedButton(
+                    title: Text(
+                      l10n.createAccount,
                       style: Theme.of(context).textTheme.titleMedium!
                           .copyWith(fontWeight: FontWeight.normal),
                     ),
-                  ],
-                ),
-                onPressed: () {
-                  final phoneStr = _phoneNumberController.value.international;
-                  if (phoneStr.isEmpty) {
-                    Utilities.showToast(l10n.invalidPhoneNumber);
-                    return;
-                  }
-                  FirebaseServices.signUpWithGoogle(phoneStr, context);
-                },
-                backgroundColor: ColorsManager.yellow,
-              ),
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(l10n.alreadyHaveAccount),
-                  CustomTextButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        RoutesManager.login,
-                      );
+                    onPressed: () async {
+                      final phoneStr = _phoneNumberController.value.international;
+                      await viewModel.register(_nameController.text.trim(), _emailController.text.trim(), _passwordController.text.trim(), phoneStr, context, selectedAvatarSeed, _formKey);
+                      if (!context.mounted) return;
+                      if (viewModel.isLoading) {
+                        Utilities.showLoadingDialog(context);
+                      }
+                      if (viewModel.errorMessage != null) {
+                        Utilities.showToast(viewModel.errorMessage!);
+                      }
                     },
-                    title: Text(
-                      l10n.login,
-                      style: Theme.of(context).textTheme.labelSmall!
-                          .copyWith(fontWeight: FontWeight.bold),
-                    ),
+                    backgroundColor: ColorsManager.yellow,
                   ),
+                  SizedBox(height: 23),
+                  CustomElevatedButton(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ImageIcon(
+                          AssetImage(ImageAssets.googleLogo),
+                          color: ColorsManager.black,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          l10n.signUpWithGoogle,
+                          style: Theme.of(context).textTheme.titleMedium!
+                              .copyWith(fontWeight: FontWeight.normal),
+                        ),
+                      ],
+                    ),
+                    onPressed: () async {
+                      final phoneStr = _phoneNumberController.value.international;
+                      if (phoneStr.isEmpty) {
+                        Utilities.showToast(l10n.invalidPhoneNumber);
+                        return;
+                      }
+                      await viewModel.signUpWithGoogle(phoneStr, context);
+                      if (!context.mounted) return;
+                      if (viewModel.isLoading) {
+                        Utilities.showLoadingDialog(context);
+                      }
+                      if (viewModel.errorMessage != null) {
+                        Utilities.showToast(viewModel.errorMessage!);
+                      }
+
+                    },
+                    backgroundColor: ColorsManager.yellow,
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(l10n.alreadyHaveAccount),
+                      CustomTextButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            RoutesManager.login,
+                          );
+                        },
+                        title: Text(
+                          l10n.login,
+                          style: Theme.of(context).textTheme.labelSmall!
+                              .copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Center(child: LangSwitch()),
                 ],
               ),
-              SizedBox(height: 16),
-              Center(child: LangSwitch()),
-            ],
+            ),
           ),
         ),
       ),

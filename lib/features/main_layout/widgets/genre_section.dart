@@ -8,6 +8,7 @@ import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/provider/config_provider.dart';
 import 'package:movies_app/repos/movie_repo/movie_repo.dart';
+import 'package:movies_app/repos/movie_repo/movie_repo_impl.dart';
 import 'package:movies_app/view_models/genre_view_model/genre_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -70,7 +71,7 @@ class _GenreSectionState extends State<GenreSection> {
         SizedBox(
           height: 240,
           child: ChangeNotifierProvider(
-            create: (_) => GenreViewModel(movieRepo: MovieRepo())..loadMoviesByGenre(widget.genre),
+            create: (_) => GenreViewModel(movieRepo: MovieRepoImpl())..loadMoviesByGenre(widget.genre),
             child: Consumer<GenreViewModel>(
               builder: (context, viewModel, child) {
                 if(viewModel.errorMessage != null && viewModel.movies.isEmpty) {

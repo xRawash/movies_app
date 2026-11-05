@@ -6,6 +6,7 @@ import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/repos/movie_repo/movie_repo.dart';
+import 'package:movies_app/repos/movie_repo/movie_repo_impl.dart';
 import 'package:movies_app/view_models/search_view_model/search_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -37,7 +38,7 @@ class _SearchTabState extends State<SearchTab> {
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
     return ChangeNotifierProvider(
-      create: (_) => SearchViewModel(movieRepo: MovieRepo()),
+      create: (_) => SearchViewModel(movieRepo: MovieRepoImpl()),
       child: Builder(
         builder: (context) =>
          SafeArea(
