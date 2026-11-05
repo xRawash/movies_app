@@ -53,6 +53,7 @@ class _HomeTabState extends State<HomeTab> {
           if (viewModel.errorMessage != null && viewModel.movies.isEmpty) {
             return Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
                     "Error loading movies",
@@ -61,7 +62,7 @@ class _HomeTabState extends State<HomeTab> {
                   CustomElevatedButton(title: Text("Try Again", style: Theme
                       .of(context)
                       .textTheme
-                      .bodyLarge,), onPressed: () {
+                      .labelMedium,), onPressed: () {
                     context.read<HomeViewModel>().loadMovies();
                   }, backgroundColor: ColorsManager.yellow)
                 ],

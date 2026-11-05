@@ -68,7 +68,7 @@ class _DiscoverTabState extends State<DiscoverTab> {
                               ),
                               const SizedBox(height: 12),
                               CustomElevatedButton(
-                                title: const Text('Try Again'),
+                                title: const Text('Try Again', style: TextStyle(color: Colors.black),),
                                 onPressed: () {
                                   viewModel.loadMoviesByGenre(selectedGenre);
                                 },

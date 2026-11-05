@@ -16,7 +16,7 @@ class BookmarkViewModel extends ChangeNotifier {
         ) ??
         false;
   }
-
+  String? successMessage;
   bool isUpdating = false;
   String? errorMessage;
 
@@ -31,12 +31,13 @@ class BookmarkViewModel extends ChangeNotifier {
     try {
       if (isBookMarked(movie.id)) {
         await _bookmarkRepo.removeMovieFromWishList(movie);
+        successMessage = 'Movie removed from wishlist';
       } else {
         await _bookmarkRepo.addMovieToWishList(movie);
+        successMessage = 'Movie added to wishlist';
       }
     } catch (e) {
       errorMessage = e.toString();
-      Utilities.showToast("Failed to update bookmark");
     } finally {
       isUpdating = false;
       notifyListeners();

@@ -256,6 +256,7 @@ class FirebaseServices {
       await userDocument.delete();
       UserModel.loggedInUser = null;
       try {
+        if(!isGoogleUser()) return;
         await GoogleSignIn.instance.signOut();
       } catch (e) {
         rethrow;
@@ -277,11 +278,19 @@ class FirebaseServices {
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    await userDocument.update({
-      'name': name,
-      'phone': phone,
-      'avatar': avatarSeed,
-    });
+    bool saved = false;
+   try {
+      await userDocument.update({
+        'name': name,
+        'phone': phone,
+        'avatar': avatarSeed,
+      }).timeout(const Duration(seconds: 10));
+    } on FirebaseException  {
+      rethrow;
+   } catch (e) {
+     rethrow;
+   }
+
   }
 
   static Future<void> addMovieToWishList(Movie movie) async {
@@ -293,8 +302,8 @@ class FirebaseServices {
       UserModel.loggedInUser!.id,
     );
     final updatedList = [...currentList, movie.toJson()];
-    bool exists = UserModel.loggedInUser!.wishListMovies!.any(
-      (item) => item['id'] == movie.id,
+    final exists = currentList.any(
+          (item) => item['id'] == movie.id,
     );
 
     if (!exists) {
@@ -356,5 +365,13 @@ class FirebaseServices {
     } catch (e) {
       throw Exception('Password reset failed: $e');
     }
+  }
+
+  static bool isGoogleUser() {
+    final user = FirebaseAuth.instance.currentUser;
+
+    return user?.providerData.any(
+          (info) => info.providerId == 'google.com',
+    ) ?? false;
   }
 }

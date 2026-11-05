@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_app/models/user_model.dart';
@@ -55,10 +57,16 @@ class UpdateProfileViewModel extends ChangeNotifier {
       phone = newPhone;
 
       return true;
+    } on TimeoutException {
+      errorMessage = 'Request timed out. Please try again.';
+      return false;
+    } on FirebaseException catch (e) {
+      errorMessage = e.message ?? 'Something went wrong. Please try again.';
+      return false;
     } catch (e) {
       errorMessage = e.toString();
       return false;
-    } finally {
+    } finally{
       isLoading = false;
       notifyListeners();
     }
