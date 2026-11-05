@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
@@ -6,9 +5,7 @@ import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/core/validations/validations.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
-import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
-import 'package:movies_app/repos/auth_repo/auth_repo.dart';
 import 'package:movies_app/repos/auth_repo/auth_repo_impl.dart';
 import 'package:movies_app/view_models/auth_view_model/auth_view_model.dart';
 import 'package:provider/provider.dart';
@@ -60,17 +57,13 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                   ),
                   SizedBox(height: 40),
                   CustomElevatedButton(
-                    title: Text(
+                    title: viewModel.isLoading ? CircularProgressIndicator() : Text(
                       l10n.verifyEmail,
                       style: Theme.of(context).textTheme.titleMedium!
                           .copyWith(fontWeight: FontWeight.normal),
                     ),
-                    onPressed: () async {
+                    onPressed: viewModel.isLoading? null : () async {
                       await viewModel.resetPassword(_emailController.text.trim(), context);
-                      if (!context.mounted) return;
-                      if (viewModel.isLoading) {
-                        Utilities.showLoadingDialog(context);
-                      }
                       if (viewModel.errorMessage != null) {
                         Utilities.showToast(viewModel.errorMessage!);
                       }

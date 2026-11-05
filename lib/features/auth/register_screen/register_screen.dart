@@ -205,18 +205,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   CustomPhoneField(controller: _phoneNumberController),
                   SizedBox(height: 16),
                   CustomElevatedButton(
-                    title: Text(
+                    title: viewModel.isLoading ? CircularProgressIndicator() : Text(
                       l10n.createAccount,
                       style: Theme.of(context).textTheme.titleMedium!
                           .copyWith(fontWeight: FontWeight.normal),
                     ),
-                    onPressed: () async {
+                    onPressed: viewModel.isLoading? null : () async {
                       final phoneStr = _phoneNumberController.value.international;
                       await viewModel.register(_nameController.text.trim(), _emailController.text.trim(), _passwordController.text.trim(), phoneStr, context, selectedAvatarSeed, _formKey);
-                      if (!context.mounted) return;
-                      if (viewModel.isLoading) {
-                        Utilities.showLoadingDialog(context);
-                      }
+
                       if (viewModel.errorMessage != null) {
                         Utilities.showToast(viewModel.errorMessage!);
                       }
@@ -225,7 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   SizedBox(height: 23),
                   CustomElevatedButton(
-                    title: Row(
+                    title: viewModel.isLoading? CircularProgressIndicator() : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ImageIcon(
@@ -240,17 +237,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ],
                     ),
-                    onPressed: () async {
+                    onPressed: viewModel.isLoading? null : () async {
                       final phoneStr = _phoneNumberController.value.international;
                       if (phoneStr.isEmpty) {
                         Utilities.showToast(l10n.invalidPhoneNumber);
                         return;
                       }
                       await viewModel.signUpWithGoogle(phoneStr, context);
-                      if (!context.mounted) return;
-                      if (viewModel.isLoading) {
-                        Utilities.showLoadingDialog(context);
-                      }
                       if (viewModel.errorMessage != null) {
                         Utilities.showToast(viewModel.errorMessage!);
                       }

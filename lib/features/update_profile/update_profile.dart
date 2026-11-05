@@ -200,7 +200,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   ),
                   Spacer(),
                   CustomElevatedButton(
-                    title: Text(
+                    title: viewModel.isLoading? CircularProgressIndicator() : Text(
                       l10n.deleteAccount,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
@@ -259,7 +259,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   ),
                   SizedBox(height: 19),
                   CustomElevatedButton(
-                    title: Text(
+                    title: viewModel.isLoading? CircularProgressIndicator() : Text(
                       l10n.updateAccount,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),

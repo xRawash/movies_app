@@ -27,9 +27,6 @@ class _ProfileTabState extends State<ProfileTab> {
       create: (_) => ProfileViewModel(profileRepo: ProfileRepoImpl()),
       child: Consumer<ProfileViewModel>(
         builder: (context, viewModel, child) {
-          if(viewModel.isLoading == true) {
-            return Center(child: CircularProgressIndicator(color: ColorsManager.yellow,));
-          }
           final movies = viewModel.moviesList();
           return SafeArea(
             child: SingleChildScrollView(
@@ -140,7 +137,7 @@ class _ProfileTabState extends State<ProfileTab> {
                             Expanded(
                               flex: 1,
                               child: CustomElevatedButton(
-                                title: Row(
+                                title: viewModel.isLoading ? CircularProgressIndicator() : Row(
                                   mainAxisAlignment:
                                   MainAxisAlignment.spaceEvenly,
                                   children: [
@@ -157,7 +154,7 @@ class _ProfileTabState extends State<ProfileTab> {
                                     Icon(Icons.logout, color: Colors.white),
                                   ],
                                 ),
-                                onPressed: () async {
+                                onPressed: viewModel.isLoading? null : () async {
                                   await context.read<ProfileViewModel>().signOut(
                                     context,
                                   );

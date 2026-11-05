@@ -98,17 +98,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     CustomElevatedButton(
-                      title: Text(
+                      title: viewModel.isLoading ? CircularProgressIndicator() : Text(
                         l10n.login,
                         style: Theme.of(context).textTheme.titleMedium!
                             .copyWith(fontWeight: FontWeight.normal),
                       ),
-                      onPressed: () async  {
+                      onPressed: viewModel.isLoading ? null : () async  {
                         await viewModel.login(_emailController.text.trim(), _passwordController.text.trim(), context, _formKey);
                         if (!context.mounted) return;
-                        if (viewModel.isLoading) {
-                          Utilities.showLoadingDialog(context);
-                        }
                         if (viewModel.errorMessage != null) {
                           Utilities.showToast(viewModel.errorMessage!);
                         }
@@ -162,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 16),
                     CustomElevatedButton(
-                      title: Row(
+                      title: viewModel.isLoading? CircularProgressIndicator() : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ImageIcon(
@@ -177,12 +174,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      onPressed: () async  {
+                      onPressed: viewModel.isLoading ? null : () async  {
                         await viewModel.loginWithGoogle(context);
-                        if (!context.mounted) return;
-                        if (viewModel.isLoading) {
-                          Utilities.showLoadingDialog(context);
-                        }
                         if (viewModel.errorMessage != null) {
                           Utilities.showToast(viewModel.errorMessage!);
                         }
