@@ -11,7 +11,7 @@ class ThemeManager {
         titleTextStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: ColorsManager.yellow)
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: ColorsManager.darkGrey,
+      backgroundColor: Colors.transparent,
       selectedItemColor: ColorsManager.yellow,
       unselectedItemColor: Colors.white,
       type: BottomNavigationBarType.fixed,
@@ -73,7 +73,7 @@ class ThemeManager {
         titleTextStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: ColorsManager.yellow)
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: ColorsManager.darkGrey,
+      backgroundColor: Colors.transparent,
       selectedItemColor: ColorsManager.yellow,
       unselectedItemColor: Colors.white,
       type: BottomNavigationBarType.fixed,
