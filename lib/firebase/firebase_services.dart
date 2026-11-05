@@ -8,7 +8,8 @@ import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/models/user_model.dart';
 
 class FirebaseServices {
-  static CollectionReference<Map<String, dynamic>> _getUsersCollectionReference() {
+  static CollectionReference<Map<String, dynamic>>
+  _getUsersCollectionReference() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     return db.collection('users');
   }
@@ -33,7 +34,13 @@ class FirebaseServices {
     return data == null ? null : UserModel.fromJson(data);
   }
 
-  static Future<bool> register(String name, String email, String password, String phoneNumber, String avatarName) async {
+  static Future<bool> register(
+    String name,
+    String email,
+    String password,
+    String phoneNumber,
+    String avatarName,
+  ) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -48,7 +55,7 @@ class FirebaseServices {
         await addUserToFirestore(user);
       } catch (e) {
         await FirebaseAuth.instance.currentUser!.delete();
-       throw Exception('Error registering user: $e');
+        throw Exception('Error registering user: $e');
       }
       return true;
     } on FirebaseAuthException catch (e) {
@@ -71,8 +78,7 @@ class FirebaseServices {
     }
   }
 
-  static Future<bool> login(String email, String password,) async {
-
+  static Future<bool> login(String email, String password) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
@@ -90,7 +96,7 @@ class FirebaseServices {
         case 'user-not-found':
           throw Exception('user-not-found');
         case 'wrong-password':
-         throw Exception("Wrong Email or Password");
+          throw Exception("Wrong Email or Password");
         case 'user-disabled':
           throw Exception('user-disabled');
         case 'too-many-requests':
@@ -102,7 +108,7 @@ class FirebaseServices {
         default:
           throw Exception('Login failed : ${e.code}');
       }
-    } on FirebaseException catch (e){
+    } on FirebaseException catch (e) {
       throw Exception('Login failed: $e');
     } catch (e) {
       throw Exception('Login failed: $e');
@@ -138,13 +144,13 @@ class FirebaseServices {
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'account-exists-with-different-credential':
-        throw Exception('account-exists-with-different-credential');
+          throw Exception('account-exists-with-different-credential');
         case 'invalid-credential':
-         throw Exception('invalid-credential');
+          throw Exception('invalid-credential');
         case 'user-disabled':
           throw Exception('user-disabled');
         case 'network-request-failed':
-         throw Exception('network-request-failed');
+          throw Exception('network-request-failed');
         default:
           throw Exception('Login failed : ${e.code}');
       }
@@ -153,7 +159,7 @@ class FirebaseServices {
     }
   }
 
-  static Future<UserCredential?> signUpWithGoogle(String phoneNumber,) async {
+  static Future<UserCredential?> signUpWithGoogle(String phoneNumber) async {
     try {
       GoogleSignInAccount googleUser = await GoogleSignIn.instance
           .authenticate();
@@ -174,19 +180,17 @@ class FirebaseServices {
           email: googleUser.email,
           phone: phoneNumber,
         );
-       try {
+        try {
           await addUserToFirestore(user);
-
         } catch (e) {
           await FirebaseAuth.instance.currentUser!.delete();
           await GoogleSignIn.instance.signOut();
           throw Exception('Error signing up with Google: $e');
-       }
+        }
 
         UserModel.loggedInUser = user;
       } else {
         UserModel.loggedInUser = existing;
-
       }
       return userCredential;
     } on GoogleSignInException catch (e) {
@@ -194,16 +198,16 @@ class FirebaseServices {
         case GoogleSignInExceptionCode.canceled:
           throw Exception('Google sign-in canceled');
         default:
-         throw Exception('Google sign-in failed');
+          throw Exception('Google sign-in failed');
       }
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'account-exists-with-different-credential':
           throw Exception('Account exists with different credential');
         case 'invalid-credential':
-         throw Exception('Invalid credential');
+          throw Exception('Invalid credential');
         case 'user-disabled':
-         throw Exception('User disabled');
+          throw Exception('User disabled');
         case 'network-request-failed':
           throw Exception('Network request failed');
         default:
@@ -216,13 +220,13 @@ class FirebaseServices {
 
   static Future<bool> signOut() async {
     try {
-      await FirebaseAuth.instance.signOut();
-      UserModel.loggedInUser = null;
+       await FirebaseAuth.instance.signOut();
       try {
-        await GoogleSignIn.instance.signOut();
+        await  GoogleSignIn.instance.signOut();
       } catch (e) {
         throw Exception('Error signing out from Google: $e');
       }
+      UserModel.loggedInUser = null;
       return true;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -235,7 +239,6 @@ class FirebaseServices {
       throw Exception('Error signing out: $e');
     }
   }
-
 
   static Future<void> deleteAccount() async {
     final firebaseUser = FirebaseAuth.instance.currentUser;
@@ -260,9 +263,8 @@ class FirebaseServices {
       try {
         await GoogleSignIn.instance.signOut();
       } catch (e) {
-        Utilities.showToast('Error signing out from Google: $e');
+        throw Exception('Error signing out from Google: $e');
       }
-
     } on FirebaseAuthException {
       rethrow;
     } on FirebaseException {
@@ -270,19 +272,21 @@ class FirebaseServices {
     }
   }
 
-  static Future<void> updateProfile({required String name, required String phone, required String avatarSeed}) async {
+  static Future<void> updateProfile({
+    required String name,
+    required String phone,
+    required String avatarSeed,
+  }) async {
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    await userDocument.update(
-      {
-        'name': name,
-        'phone': phone,
-        'avatar': avatarSeed,
-      },
-    );
+    await userDocument.update({
+      'name': name,
+      'phone': phone,
+      'avatar': avatarSeed,
+    });
   }
 
   static Future<void> addMovieToWishList(Movie movie) async {
@@ -294,13 +298,12 @@ class FirebaseServices {
       UserModel.loggedInUser!.id,
     );
     final updatedList = [...currentList, movie.toJson()];
-    bool exists = UserModel.loggedInUser!.wishListMovies!
-        .any((item) => item['id'] == movie.id);
+    bool exists = UserModel.loggedInUser!.wishListMovies!.any(
+      (item) => item['id'] == movie.id,
+    );
 
     if (!exists) {
-      await userDocument.update({
-        'watchList': updatedList,
-      });
+      await userDocument.update({'watchList': updatedList});
       user.wishListMovies = updatedList;
     } else {
       return;
@@ -316,12 +319,11 @@ class FirebaseServices {
     final currentList = UserModel.loggedInUser!.watchedMovies ?? [];
     final updatedList = [...currentList, movie.toJson()];
 
-    bool exists = UserModel.loggedInUser!.watchedMovies!
-        .any((item) => item['id'] == movie.id);
+    bool exists = UserModel.loggedInUser!.watchedMovies!.any(
+      (item) => item['id'] == movie.id,
+    );
     if (!exists) {
-      await userDox.update({
-        'history' : updatedList
-      });
+      await userDox.update({'history': updatedList});
       UserModel.loggedInUser!.watchedMovies = updatedList;
     }
   }
@@ -329,20 +331,19 @@ class FirebaseServices {
   static Future<void> removeMovieFromWishList(Movie movie) async {
     final user = UserModel.loggedInUser;
     final currentList = user!.wishListMovies ?? [];
-    final updatedList = currentList.where((item) => item['id'] != movie.id).toList();
+    final updatedList = currentList
+        .where((item) => item['id'] != movie.id)
+        .toList();
     CollectionReference<Map<String, dynamic>> usersCollection =
         _getUsersCollectionReference();
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    await userDocument.update({
-      'watchList': updatedList,
-    });
+    await userDocument.update({'watchList': updatedList});
     user.wishListMovies = updatedList;
-
   }
 
-  static Future<bool> resetPassword(String email,) async {
+  static Future<bool> resetPassword(String email) async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       return true;
