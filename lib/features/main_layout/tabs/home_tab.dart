@@ -8,7 +8,6 @@ import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 import 'package:movies_app/features/main_layout/widgets/genre_section.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
-import 'package:movies_app/repos/movie_repo/movie_repo.dart';
 import 'package:movies_app/repos/movie_repo/movie_repo_impl.dart';
 import 'package:movies_app/view_models/home_view_model/home_view_model.dart';
 import 'package:provider/provider.dart';

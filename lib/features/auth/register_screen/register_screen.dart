@@ -10,7 +10,6 @@ import 'package:movies_app/core/widgets/custom_phone_field.dart';
 import 'package:movies_app/core/widgets/custom_text_button.dart';
 import 'package:movies_app/core/widgets/custom_text_field.dart';
 import 'package:movies_app/core/widgets/lang_switch.dart';
-import 'package:movies_app/firebase/firebase_services.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/repos/auth_repo/auth_repo_impl.dart';
 import 'package:movies_app/view_models/auth_view_model/auth_view_model.dart';
@@ -96,10 +95,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             double value = 1.0;
                             if (_pageController.position.haveDimensions) {
                               value = _pageController.page! - index;
-                              value = (1 - (value.abs() * 0.25)).clamp(0.75, 1.0);
+                              value = (1 - (value.abs() * 0.25)).clamp(
+                                0.75,
+                                1.0,
+                              );
                             }
                             return Center(
-                              child: Transform.scale(scale: value, child: child),
+                              child: Transform.scale(
+                                scale: value,
+                                child: child,
+                              ),
                             );
                           },
                           child: Container(
@@ -129,11 +134,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: Image.network(
                                 'https://api.dicebear.com/7.x/avataaars/png?seed=$seed',
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) => Icon(
-                                  Icons.person,
-                                  color: ColorsManager.yellow,
-                                  size: 36,
-                                ),
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Icon(
+                                      Icons.person,
+                                      color: ColorsManager.yellow,
+                                      size: 36,
+                                    ),
                               ),
                             ),
                           ),
@@ -183,10 +189,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   SizedBox(height: 16),
                   CustomTextField(
                     controller: _passwordConfirmController,
-                    validation: (value) => Validations.validatePasswordConfirmation(
-                      value,
-                      _passwordController.text,
-                    ),
+                    validation: (value) =>
+                        Validations.validatePasswordConfirmation(
+                          value,
+                          _passwordController.text,
+                        ),
                     obscureText: isObscured,
                     hint: l10n.confirmPassword,
                     prefixIcon: Icon(Icons.lock),
@@ -205,50 +212,80 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   CustomPhoneField(controller: _phoneNumberController),
                   SizedBox(height: 16),
                   CustomElevatedButton(
-                    title: viewModel.isLoading ? CircularProgressIndicator() : Text(
-                      l10n.createAccount,
-                      style: Theme.of(context).textTheme.titleMedium!
-                          .copyWith(fontWeight: FontWeight.normal),
-                    ),
-                    onPressed: viewModel.isLoading? null : () async {
-                      final phoneStr = _phoneNumberController.value.international;
-                      await viewModel.register(_nameController.text.trim(), _emailController.text.trim(), _passwordController.text.trim(), phoneStr, context, selectedAvatarSeed, _formKey);
-
-                      if (viewModel.errorMessage != null) {
-                        Utilities.showToast(viewModel.errorMessage!);
-                      }
-                    },
+                    title: viewModel.isLoading
+                        ? CircularProgressIndicator()
+                        : Text(
+                            l10n.createAccount,
+                            style: Theme.of(context).textTheme.titleMedium!
+                                .copyWith(fontWeight: FontWeight.normal),
+                          ),
+                    onPressed: viewModel.isLoading
+                        ? null
+                        : () async {
+                            if (_formKey.currentState!.validate() == false) {
+                              return;
+                            }
+                            final phoneStr =
+                                _phoneNumberController.value.international;
+                            bool succeeded = await viewModel.register(
+                              _nameController.text.trim(),
+                              _emailController.text.trim(),
+                              _passwordController.text.trim(),
+                              phoneStr,
+                              selectedAvatarSeed,
+                            );
+                            if (viewModel.errorMessage != null) {
+                              Utilities.showToast(viewModel.errorMessage!);
+                            }
+                            if (!context.mounted) return;
+                            if (succeeded) {
+                              Utilities.showToast(l10n.accountCreatedSuccessfully);
+                              Navigator.pushReplacementNamed(
+                                context,
+                                RoutesManager.login,
+                              );
+                            }
+                          },
                     backgroundColor: ColorsManager.yellow,
                   ),
                   SizedBox(height: 23),
                   CustomElevatedButton(
-                    title: viewModel.isLoading? CircularProgressIndicator() : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ImageIcon(
-                          AssetImage(ImageAssets.googleLogo),
-                          color: ColorsManager.black,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          l10n.signUpWithGoogle,
-                          style: Theme.of(context).textTheme.titleMedium!
-                              .copyWith(fontWeight: FontWeight.normal),
-                        ),
-                      ],
-                    ),
-                    onPressed: viewModel.isLoading? null : () async {
-                      final phoneStr = _phoneNumberController.value.international;
-                      if (phoneStr.isEmpty) {
-                        Utilities.showToast(l10n.invalidPhoneNumber);
-                        return;
-                      }
-                      await viewModel.signUpWithGoogle(phoneStr, context);
-                      if (viewModel.errorMessage != null) {
-                        Utilities.showToast(viewModel.errorMessage!);
-                      }
-
-                    },
+                    title: viewModel.isLoading
+                        ? CircularProgressIndicator()
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ImageIcon(
+                                AssetImage(ImageAssets.googleLogo),
+                                color: ColorsManager.black,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                l10n.signUpWithGoogle,
+                                style: Theme.of(context).textTheme.titleMedium!
+                                    .copyWith(fontWeight: FontWeight.normal),
+                              ),
+                            ],
+                          ),
+                    onPressed: viewModel.isLoading
+                        ? null
+                        : () async {
+                            final phoneStr =
+                                _phoneNumberController.value.international;
+                            if (phoneStr.isEmpty) {
+                              Utilities.showToast(l10n.invalidPhoneNumber);
+                              return;
+                            }
+                          final userCred = await viewModel.signUpWithGoogle(phoneStr);
+                            if (viewModel.errorMessage != null) {
+                              Utilities.showToast(viewModel.errorMessage!);
+                            }
+                            if (userCred != null) {
+                              if(!context.mounted) return;
+                              Utilities.showToast("Welcome ${userCred.user!.displayName}");
+                              Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
+                            }
+                          },
                     backgroundColor: ColorsManager.yellow,
                   ),
                   SizedBox(height: 16),

@@ -2,12 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
-import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
-import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/models/user_model.dart';
 
 class FirebaseServices {
@@ -36,9 +33,7 @@ class FirebaseServices {
     return data == null ? null : UserModel.fromJson(data);
   }
 
-  static Future<void> register(String name, String email, String password, String phoneNumber, BuildContext context, String avatarName, GlobalKey<FormState> key,) async {
-    if (key.currentState!.validate() == false) return;
-    var l10n = AppLocalizations.of(context)!;
+  static Future<bool> register(String name, String email, String password, String phoneNumber, String avatarName) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -55,12 +50,7 @@ class FirebaseServices {
         await FirebaseAuth.instance.currentUser!.delete();
        throw Exception('Error registering user: $e');
       }
-
-      if (!context.mounted) {
-        return;
-      }
-      Utilities.showToast(l10n.accountCreatedSuccessfully);
-      Navigator.pushReplacementNamed(context, RoutesManager.login);
+      return true;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':
@@ -81,24 +71,18 @@ class FirebaseServices {
     }
   }
 
-  static Future<void> login(String email, String password, BuildContext context, GlobalKey<FormState> key,) async {
-    if (key.currentState!.validate() == false) return;
-    var l10n = AppLocalizations.of(context)!;
+  static Future<bool> login(String email, String password,) async {
+
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
       final user = await getCurrentUser(userCredential.user!.uid);
       if (user == null) {
         await FirebaseAuth.instance.signOut();
-        Utilities.showToast(l10n.noProfileFound);
-        return;
+        throw Exception('No profile found');
       }
       UserModel.loggedInUser = user;
-      if (!context.mounted) {
-        return;
-      }
-      Utilities.showToast(l10n.loggedInSuccessfully);
-      Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
+      return true;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'invalid-credential':
@@ -106,7 +90,7 @@ class FirebaseServices {
         case 'user-not-found':
           throw Exception('user-not-found');
         case 'wrong-password':
-         throw Exception(l10n.loginFailed);
+         throw Exception("Wrong Email or Password");
         case 'user-disabled':
           throw Exception('user-disabled');
         case 'too-many-requests':
@@ -125,8 +109,7 @@ class FirebaseServices {
     }
   }
 
-  static Future<UserCredential?> loginWithGoogle(BuildContext context) async {
-    var l10n = AppLocalizations.of(context)!;
+  static Future<UserCredential?> loginWithGoogle() async {
     try {
       GoogleSignInAccount googleUser = await GoogleSignIn.instance
           .authenticate();
@@ -140,19 +123,17 @@ class FirebaseServices {
       if (user == null) {
         await FirebaseAuth.instance.signOut();
         await GoogleSignIn.instance.signOut();
-        throw Exception(l10n.noProfileFound);
+        throw Exception('No profile found');
       }
       UserModel.loggedInUser = user;
-      if (!context.mounted) return userCredential;
-      Utilities.showToast(l10n.loggedInSuccessfully);
-      Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
+
       return userCredential;
     } on GoogleSignInException catch (e) {
       switch (e.code) {
         case GoogleSignInExceptionCode.canceled:
-          throw Exception(l10n.signInCancelled);
+          throw Exception("Google sign-in canceled");
         default:
-          throw Exception(l10n.googleSignInFailed);
+          throw Exception("Google sign-in failed");
       }
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -172,8 +153,7 @@ class FirebaseServices {
     }
   }
 
-  static Future<UserCredential?> signUpWithGoogle(String phoneNumber, BuildContext context,) async {
-    var l10n = AppLocalizations.of(context)!;
+  static Future<UserCredential?> signUpWithGoogle(String phoneNumber,) async {
     try {
       GoogleSignInAccount googleUser = await GoogleSignIn.instance
           .authenticate();
@@ -201,15 +181,11 @@ class FirebaseServices {
           await FirebaseAuth.instance.currentUser!.delete();
           throw Exception('Error signing up with Google: $e');
        }
-        if (!context.mounted) return userCredential;
-        Utilities.showToast(l10n.accountCreatedSuccessfully);
+
         UserModel.loggedInUser = user;
-        Navigator.pushReplacementNamed(context, RoutesManager.login);
       } else {
         UserModel.loggedInUser = existing;
-        if (!context.mounted) return userCredential;
-        Utilities.showToast(l10n.welcomeBack);
-        Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
+
       }
       return userCredential;
     } on GoogleSignInException catch (e) {
@@ -230,39 +206,32 @@ class FirebaseServices {
         case 'network-request-failed':
           throw Exception('Network request failed');
         default:
-          Utilities.showToast(l10n.googleSignInFailed);
+          throw Exception('Error signing up with Google: $e');
       }
-      return null;
     } catch (e) {
       throw Exception('Error signing up with Google: $e');
     }
   }
 
-  static Future<bool> signOut(BuildContext context) async {
-    var l10n = AppLocalizations.of(context)!;
+  static Future<bool> signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
       UserModel.loggedInUser = null;
       try {
         await GoogleSignIn.instance.signOut();
       } catch (e) {
-        Utilities.showToast("Error signing out from Google: $e");
+        throw Exception('Error signing out from Google: $e');
       }
-      Utilities.showToast(l10n.loggedOutSuccessfully);
-
       return true;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'network-request-failed':
-          Utilities.showToast(l10n.networkError);
-          break;
+          throw Exception('Network request failed');
         default:
-          Utilities.showToast(l10n.signOutFailed);
+          throw Exception('Error signing out: $e');
       }
-      return false;
     } catch (e) {
-      Utilities.showToast(l10n.signOutFailed);
-      return false;
+      throw Exception('Error signing out: $e');
     }
   }
 
@@ -372,26 +341,23 @@ class FirebaseServices {
 
   }
 
-  static Future<void> resetPassword(String email, BuildContext context) async {
-    var l10n = AppLocalizations.of(context)!;
+  static Future<bool> resetPassword(String email,) async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      if (!context.mounted) return;
-      Utilities.showToast(l10n.passwordResetEmailSent);
-      Navigator.pop(context);
+      return true;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'invalid-email':
-          throw Exception(l10n.invalidEmail);
+          throw Exception('invalid-email');
         case 'user-not-found':
           throw Exception('user-not-found');
         case 'network-request-failed':
-          throw Exception(l10n.networkError);
+          throw Exception('network-request-failed');
         default:
-          throw Exception(l10n.passwordResetFailed);
+          throw Exception('Password reset failed: ${e.code}');
       }
     } catch (e) {
-      throw Exception(l10n.passwordResetFailed);
+      throw Exception('Password reset failed: $e');
     }
   }
 }

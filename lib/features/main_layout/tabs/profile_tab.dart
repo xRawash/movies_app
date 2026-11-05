@@ -3,6 +3,7 @@ import 'package:movies_app/api/movie_response/movies.dart';
 import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
+import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
@@ -155,9 +156,15 @@ class _ProfileTabState extends State<ProfileTab> {
                                   ],
                                 ),
                                 onPressed: viewModel.isLoading? null : () async {
-                                  await context.read<ProfileViewModel>().signOut(
-                                    context,
-                                  );
+                                  bool succeeded = await context.read<ProfileViewModel>().signOut();
+                                  if (viewModel.errorMessage != null) {
+                                    Utilities.showToast(viewModel.errorMessage!);
+                                  }
+                                  if(succeeded) {
+                                    if (!context.mounted) return;
+                                    Utilities.showToast(l10n.loggedOutSuccessfully);
+                                    Navigator.pushReplacementNamed(context, RoutesManager.login);
+                                  }
                                 },
                                 backgroundColor: ColorsManager.red,
                               ),

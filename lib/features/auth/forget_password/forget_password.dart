@@ -63,9 +63,14 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                           .copyWith(fontWeight: FontWeight.normal),
                     ),
                     onPressed: viewModel.isLoading? null : () async {
-                      await viewModel.resetPassword(_emailController.text.trim(), context);
+                      bool succeeded = await viewModel.resetPassword(_emailController.text.trim(),);
                       if (viewModel.errorMessage != null) {
                         Utilities.showToast(viewModel.errorMessage!);
+                      }
+                      if(succeeded) {
+                        if (!context.mounted) return;
+                        Utilities.showToast("Email sent successfully");
+                        Navigator.pop(context);
                       }
                     },
                     backgroundColor: ColorsManager.yellow,

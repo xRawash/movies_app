@@ -10,29 +10,29 @@ class AuthViewModel extends ChangeNotifier {
   String? errorMessage;
   bool isLoading = false;
 
-  Future<void> login(String email,
-      String password,
-      BuildContext context,
-      GlobalKey<FormState> key,) async {
+  Future<bool> login(String email,
+      String password,) async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
     try {
-      await _authRepo.login(email, password, context, key);
+      await _authRepo.login(email, password);
+      return true;
     } catch (e) {
       errorMessage = e.toString().substring(11);
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<UserCredential?> loginWithGoogle(BuildContext context) async {
+  Future<UserCredential?> loginWithGoogle() async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
     try {
-      return await _authRepo.loginWithGoogle(context);
+      return await _authRepo.loginWithGoogle();
     } catch (e) {
       errorMessage = e.toString().substring(11);
     } finally {
@@ -42,13 +42,11 @@ class AuthViewModel extends ChangeNotifier {
     return null;
   }
 
-  Future<void> register(String name,
+  Future<bool> register(String name,
       String email,
       String password,
       String phoneNumber,
-      BuildContext context,
-      String avatarName,
-      GlobalKey<FormState> key,) async {
+      String avatarName,) async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
@@ -58,12 +56,12 @@ class AuthViewModel extends ChangeNotifier {
         email,
         password,
         phoneNumber,
-        context,
         avatarName,
-        key,
       );
+      return true;
     } catch (e) {
       errorMessage = e.toString().substring(11);
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();
@@ -71,12 +69,12 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   Future<UserCredential?> signUpWithGoogle(String phoneNumber,
-      BuildContext context,) async {
+      ) async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
     try {
-      return await _authRepo.signUpWithGoogle(phoneNumber, context);
+      return await _authRepo.signUpWithGoogle(phoneNumber,);
     } catch (e) {
       errorMessage = e.toString().substring(11);
     } finally {
@@ -86,14 +84,16 @@ class AuthViewModel extends ChangeNotifier {
     return null;
   }
 
-  Future<void> resetPassword (String email,BuildContext context,) async {
+  Future<bool> resetPassword (String email ,) async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
     try {
-      await _authRepo.resetPassword( email, context);
+      await _authRepo.resetPassword( email,);
+      return true;
     } catch (e) {
       errorMessage = e.toString().substring(11);
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();

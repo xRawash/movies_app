@@ -1,4 +1,3 @@
-import 'package:movies_app/api/api_services.dart';
 import 'package:movies_app/api/movie_response/movies_response.dart';
 
 import '../../api/movie_detailed_response/movie_detailed_response.dart';

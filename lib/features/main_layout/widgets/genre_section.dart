@@ -7,7 +7,6 @@ import 'package:movies_app/features/main_layout/genres_ids/genres_ids.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
 import 'package:movies_app/provider/config_provider.dart';
-import 'package:movies_app/repos/movie_repo/movie_repo.dart';
 import 'package:movies_app/repos/movie_repo/movie_repo_impl.dart';
 import 'package:movies_app/view_models/genre_view_model/genre_view_model.dart';
 import 'package:provider/provider.dart';

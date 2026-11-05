@@ -104,10 +104,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             .copyWith(fontWeight: FontWeight.normal),
                       ),
                       onPressed: viewModel.isLoading ? null : () async  {
-                        await viewModel.login(_emailController.text.trim(), _passwordController.text.trim(), context, _formKey);
+                        if (_formKey.currentState!.validate() == false) return;
+                        bool succeeded = await viewModel.login(_emailController.text.trim(), _passwordController.text.trim(),);
                         if (!context.mounted) return;
                         if (viewModel.errorMessage != null) {
                           Utilities.showToast(viewModel.errorMessage!);
+                        }
+                        if(succeeded) {
+                          if (!context.mounted) return;
+                          Utilities.showToast(l10n.loggedInSuccessfully);
+                          Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
                         }
                       },
                       backgroundColor: ColorsManager.yellow,
@@ -175,9 +181,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                       onPressed: viewModel.isLoading ? null : () async  {
-                        await viewModel.loginWithGoogle(context);
+
+                       final userCred = await viewModel.loginWithGoogle();
                         if (viewModel.errorMessage != null) {
                           Utilities.showToast(viewModel.errorMessage!);
+                        }
+                        if(userCred != null) {
+                          if (!context.mounted) return;
+                          Utilities.showToast(l10n.welcomeBack);
+                          Navigator.pushReplacementNamed(context, RoutesManager.mainScreen);
                         }
                       },
                       backgroundColor: ColorsManager.yellow,

@@ -9,7 +9,6 @@ import 'package:movies_app/features/movie_details/widgets/movie_bookmark.dart';
 import 'package:movies_app/features/movie_details/widgets/resolution_dialog.dart';
 import 'package:movies_app/features/movie_item/movie_item.dart';
 import 'package:movies_app/l10n/app_localizations.dart';
-import 'package:movies_app/repos/movie_repo/movie_repo.dart';
 import 'package:movies_app/repos/movie_repo/movie_repo_impl.dart';
 import 'package:movies_app/view_models/movie_detail_view_model/movie_detail_view_model.dart';
 import 'package:provider/provider.dart';

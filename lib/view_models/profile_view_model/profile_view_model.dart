@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/repos/profile_repo/profile_repo.dart';
 
@@ -14,18 +13,16 @@ class ProfileViewModel extends ChangeNotifier {
   UserModel currentUser = UserModel.loggedInUser!;
   int selectedTab = 0;
 
-  Future<void> signOut(BuildContext context) async {
+  Future<bool> signOut() async {
     isLoading = true;
     errorMessage = null;
     notifyListeners();
     try {
-      bool success = await _profileRepo.signOut(context);
-      if (success) {
-        if (!context.mounted) return;
-        Navigator.pushReplacementNamed(context, RoutesManager.login);
-      }
+      await _profileRepo.signOut();
+      return true;
     } catch (e) {
       errorMessage = e.toString();
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();
