@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
-import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/models/user_model.dart';
 
 class FirebaseServices {
@@ -55,26 +54,26 @@ class FirebaseServices {
         await addUserToFirestore(user);
       } catch (e) {
         await FirebaseAuth.instance.currentUser!.delete();
-        throw Exception('Error registering user: $e');
+        rethrow;
       }
       return true;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':
-          throw Exception('Email already in use');
+          rethrow;
         case 'weak-password':
-          throw Exception('Weak password');
+          rethrow;
         case 'invalid-email':
-          throw Exception('Invalid email');
+          rethrow;
         case 'network-request-failed':
-          throw Exception('Network request failed');
+          rethrow;
         default:
-          throw Exception('Registration failed: $e');
+          rethrow;
       }
     } on FirebaseException catch (e) {
-      throw Exception('Registration failed: $e');
+      rethrow;
     } catch (e) {
-      throw Exception('Registration failed: $e');
+      rethrow;
     }
   }
 
@@ -85,33 +84,33 @@ class FirebaseServices {
       final user = await getCurrentUser(userCredential.user!.uid);
       if (user == null) {
         await FirebaseAuth.instance.signOut();
-        throw Exception('No profile found');
+        throw ('No profile found');
       }
       UserModel.loggedInUser = user;
       return true;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'invalid-credential':
-          throw Exception('invalid-credential');
+         rethrow;
         case 'user-not-found':
-          throw Exception('user-not-found');
+          rethrow;
         case 'wrong-password':
-          throw Exception("Wrong Email or Password");
+          rethrow;
         case 'user-disabled':
-          throw Exception('user-disabled');
+          rethrow;
         case 'too-many-requests':
-          throw Exception('too-many-requests');
+          rethrow;
         case 'network-request-failed':
-          throw Exception('network-request-failed');
+          rethrow;
         case 'invalid-email':
-          throw Exception('invalid-email');
+          rethrow;
         default:
-          throw Exception('Login failed : ${e.code}');
+          rethrow;
       }
     } on FirebaseException catch (e) {
-      throw Exception('Login failed: $e');
+      rethrow;
     } catch (e) {
-      throw Exception('Login failed: $e');
+      rethrow;
     }
   }
 
@@ -129,7 +128,7 @@ class FirebaseServices {
       if (user == null) {
         await FirebaseAuth.instance.signOut();
         await GoogleSignIn.instance.signOut();
-        throw Exception('No profile found');
+        throw ('No profile found');
       }
       UserModel.loggedInUser = user;
 
@@ -137,25 +136,25 @@ class FirebaseServices {
     } on GoogleSignInException catch (e) {
       switch (e.code) {
         case GoogleSignInExceptionCode.canceled:
-          throw Exception("Google sign-in canceled");
-        default:
-          throw Exception("Google sign-in failed");
+           rethrow;
+           default:
+          throw ("Google sign-in failed");
       }
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          throw Exception('account-exists-with-different-credential');
+          rethrow;
         case 'invalid-credential':
-          throw Exception('invalid-credential');
+          rethrow;
         case 'user-disabled':
-          throw Exception('user-disabled');
+          rethrow;
         case 'network-request-failed':
-          throw Exception('network-request-failed');
+          rethrow;
         default:
-          throw Exception('Login failed : ${e.code}');
+          rethrow;
       }
     } catch (e) {
-      throw Exception(e);
+      rethrow;
     }
   }
 
@@ -185,7 +184,7 @@ class FirebaseServices {
         } catch (e) {
           await FirebaseAuth.instance.currentUser!.delete();
           await GoogleSignIn.instance.signOut();
-          throw Exception('Error signing up with Google: $e');
+          rethrow;
         }
 
         UserModel.loggedInUser = user;
@@ -196,48 +195,49 @@ class FirebaseServices {
     } on GoogleSignInException catch (e) {
       switch (e.code) {
         case GoogleSignInExceptionCode.canceled:
-          throw Exception('Google sign-in canceled');
+          rethrow;
         default:
-          throw Exception('Google sign-in failed');
+          rethrow;
       }
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'account-exists-with-different-credential':
-          throw Exception('Account exists with different credential');
+          rethrow;
         case 'invalid-credential':
-          throw Exception('Invalid credential');
+          rethrow;
         case 'user-disabled':
-          throw Exception('User disabled');
+          rethrow;
         case 'network-request-failed':
-          throw Exception('Network request failed');
+          rethrow;
         default:
-          throw Exception('Error signing up with Google: $e');
+          rethrow;
       }
     } catch (e) {
-      throw Exception('Error signing up with Google: $e');
+      rethrow;
     }
   }
 
   static Future<bool> signOut() async {
     try {
        await FirebaseAuth.instance.signOut();
-      try {
-        await  GoogleSignIn.instance.signOut();
-      } catch (e) {
-        throw Exception('Error signing out from Google: $e');
-      }
-      UserModel.loggedInUser = null;
-      return true;
+       UserModel.loggedInUser = null;
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'network-request-failed':
-          throw Exception('Network request failed');
+          rethrow;
         default:
-          throw Exception('Error signing out: $e');
+          rethrow;
       }
     } catch (e) {
-      throw Exception('Error signing out: $e');
+      rethrow;
     }
+      try {
+        await  GoogleSignIn.instance.signOut();
+      } catch (e) {
+        rethrow;
+      }
+      return true;
+
   }
 
   static Future<void> deleteAccount() async {
@@ -249,21 +249,16 @@ class FirebaseServices {
         message: 'No authenticated user found.',
       );
     }
-
-    final userId = firebaseUser.uid;
-    final userDocument = _getUsersCollectionReference().doc(userId);
-
     try {
-      await userDocument.delete();
-
       await firebaseUser.delete();
-
+      final userId = firebaseUser.uid;
+      final userDocument = _getUsersCollectionReference().doc(userId);
+      await userDocument.delete();
       UserModel.loggedInUser = null;
-
       try {
         await GoogleSignIn.instance.signOut();
       } catch (e) {
-        throw Exception('Error signing out from Google: $e');
+        rethrow;
       }
     } on FirebaseAuthException {
       rethrow;
