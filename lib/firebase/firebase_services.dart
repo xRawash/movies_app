@@ -70,7 +70,7 @@ class FirebaseServices {
         default:
           rethrow;
       }
-    } on FirebaseException catch (e) {
+    } on FirebaseException  {
       rethrow;
     } catch (e) {
       rethrow;
@@ -107,7 +107,7 @@ class FirebaseServices {
         default:
           rethrow;
       }
-    } on FirebaseException catch (e) {
+    } on FirebaseException {
       rethrow;
     } catch (e) {
       rethrow;
@@ -278,7 +278,6 @@ class FirebaseServices {
     DocumentReference<Map<String, dynamic>> userDocument = usersCollection.doc(
       UserModel.loggedInUser!.id,
     );
-    bool saved = false;
    try {
       await userDocument.update({
         'name': name,

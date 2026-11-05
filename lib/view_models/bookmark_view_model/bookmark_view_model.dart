@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
-import 'package:movies_app/core/utilities/utilities.dart';
 import 'package:movies_app/models/user_model.dart';
 import 'package:movies_app/repos/bookmark_repo/bookmark_repo.dart';
 
