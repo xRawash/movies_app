@@ -10,7 +10,7 @@ class SubtitleViewModel extends ChangeNotifier {
 
   bool isLoading = false;
   bool isDownloading = false;
-
+  String? _downloadingSubtitleUrl;
   String? errorMessage;
   String? selectedSubtitlePath;
 
@@ -57,14 +57,19 @@ class SubtitleViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> downloadSubtitle(
-      SubdlSubtitle subtitle,
-      ) async {
-    if (isDownloading) return false;
 
-    isDownloading = true;
+
+  bool isDownloadingSubtitle(SubdlSubtitle subtitle) {
+    return _downloadingSubtitleUrl == subtitle.downloadUrl;
+  }
+
+  bool get hasActiveDownload => _downloadingSubtitleUrl != null;
+
+  Future<bool> downloadSubtitle(SubdlSubtitle subtitle) async {
+    if (hasActiveDownload) return false;
+
+    _downloadingSubtitleUrl = subtitle.downloadUrl;
     errorMessage = null;
-
     notifyListeners();
 
     try {
@@ -78,7 +83,7 @@ class SubtitleViewModel extends ChangeNotifier {
       errorMessage = e.toString();
       return false;
     } finally {
-      isDownloading = false;
+      _downloadingSubtitleUrl = null;
       notifyListeners();
     }
   }

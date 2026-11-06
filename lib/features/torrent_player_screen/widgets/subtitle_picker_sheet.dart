@@ -184,21 +184,17 @@ class _SubtitlePickerSheetState
                                 ' • ${subtitle.format.toUpperCase()}',
                             style: Theme.of(context).textTheme.titleSmall!.copyWith(color: ColorsManager.grey),
                           ),
-                          trailing: vm.isDownloading
+                          trailing: vm.isDownloadingSubtitle(subtitle)
                               ? const SizedBox(
                             width: 22,
                             height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ),
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           )
                               : IconButton(
-                            icon: const Icon(
-                              Icons.download,
-                            ),
-                            onPressed: () {
-                              _download(subtitle);
-                            },
+                            icon: const Icon(Icons.download),
+                            onPressed: vm.hasActiveDownload
+                                ? null
+                                : () => _download(subtitle),
                           ),
                         );
                       },

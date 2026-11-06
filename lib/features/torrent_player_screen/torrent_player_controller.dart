@@ -191,6 +191,22 @@ class TorrentPlayerController extends ChangeNotifier {
             _chewieController!.notifyListeners();
           }
         },
+        showSubtitles: false,
+        subtitleStyle: const SubtitleStyle(
+          textStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+          padding: EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.black54,
+          ),
+        ),
       );
 
       notifyListeners();
@@ -231,14 +247,23 @@ class TorrentPlayerController extends ChangeNotifier {
     );
 
     _subtitleCues[id] = subtitles;
-
     _subtitleTracks[id] = track;
 
     chewie.setSubtitleTracks(
       _subtitleTracks.values.toList(),
     );
 
+
+    chewie.setSubtitle(subtitles);
+
+
+    chewie.showSubtitles = true;
+
+
     chewie.selectSubtitleTrack(track);
+
+    chewie.notifyListeners();
+
   }
 
   void turnOffSubtitleTrack() {
@@ -271,7 +296,7 @@ class TorrentPlayerController extends ChangeNotifier {
 
       _historySaved = true;
     } catch (e) {
-      debugPrint('Failed to save movie history: $e');
+      _errorMessage = 'Failed to add movie to history.';
     } finally {
       _historySaving = false;
     }

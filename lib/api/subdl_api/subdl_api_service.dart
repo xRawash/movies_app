@@ -84,8 +84,11 @@ class SubdlApiService {
     return subtitles
         .whereType<Map<String, dynamic>>()
         .map(SubdlSubtitle.fromJson)
-        .where((subtitle) => subtitle.downloadUrl.isNotEmpty)
-        .toList();
+        .where(
+          (subtitle) =>
+      subtitle.downloadUrl.isNotEmpty &&
+          subtitle.format.toLowerCase() == 'srt',
+    ).toList();
   }
 
   Future<String> downloadSubtitle(

@@ -44,11 +44,10 @@ class _TorrentPlayerScreenState
       torrentId: widget.torrentId,
       movie: widget.movie,
     )..start();
-
     _subtitleApiService = SubdlApiService();
 
     _subtitleViewModel = SubtitleViewModel(
-      repository: SubtitleRepoImpl(apiService: SubdlApiService())
+      repository: SubtitleRepoImpl(apiService: _subtitleApiService)
     );
   }
 
