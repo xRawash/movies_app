@@ -43,6 +43,7 @@ class _TorrentPlayerScreenState
       magnetLink: widget.magnetLink,
       torrentId: widget.torrentId,
       movie: widget.movie,
+      onSubtitlesPressed: _showSubtitlePicker
     )..start();
     _subtitleApiService = SubdlApiService();
 
@@ -67,7 +68,7 @@ class _TorrentPlayerScreenState
 
       if (!mounted) return;
 
-      // Register the track and its subtitle cues.
+
       _controller.addSubtitleTrack(
         id: path,
         label: subtitle.releaseName.isNotEmpty
@@ -115,20 +116,12 @@ class _TorrentPlayerScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      extendBody: true,
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          IconButton(
-            tooltip: 'Search subtitles',
-            onPressed: _showSubtitlePicker,
-            icon: const Icon(
-              Icons.subtitles,
-              color: Colors.white,
-            ),
-          ),
-        ],
       ),
       body: Center(
         child: ListenableBuilder(

@@ -17,11 +17,13 @@ class TorrentPlayerController extends ChangeNotifier {
     required this.magnetLink,
     required this.torrentId,
     required this.movie,
+    required this.onSubtitlesPressed
   });
 
   final _engine = LibtorrentFlutter.instance;
 
   String get _resumeKey => 'resume_$torrentId';
+  final VoidCallback onSubtitlesPressed;
 
   Movie movie;
 
@@ -207,50 +209,67 @@ class TorrentPlayerController extends ChangeNotifier {
             color: Colors.black54,
           ),
         ),
-        overlay: IgnorePointer(
-          child: ListenableBuilder(
-            listenable: _videoController!,
-            builder: (context, child) {
-              final subtitle = getSubtitleAt(
-                _videoController!.value.position,
-              );
+        additionalControls: (context) => [
+          IconButton(
+            tooltip: 'Search subtitles',
+            onPressed: onSubtitlesPressed,
+            icon: const Icon(
+              Icons.subtitles,
+              color: Colors.white,
+            ),
+          ),
+        ],
 
-              if (subtitle == null) {
-                return const SizedBox.shrink();
-              }
+        overlay: Stack(
+          fit: StackFit.expand,
+          children: [
+            IgnorePointer(
+              child: ListenableBuilder(
+                listenable: _videoController!,
+                builder: (context, child) {
+                  final subtitle = getSubtitleAt(
+                    _videoController!.value.position,
+                  );
 
-              return Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20,
-                    right: 20,
-                    bottom: 25,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.75),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      subtitle.text,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
+                  if (subtitle == null) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        bottom: 25,
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.75),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          subtitle.text,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              );
-            },
-          ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
+
       );
 
       notifyListeners();
