@@ -160,7 +160,7 @@ class _HomeTabState extends State<HomeTab> {
                   ...GenresIds.genres
                       .take(5)
                       .map((genre) => GenreSection(genre: genre)),
-                  const SizedBox(height: 40),
+
                 ],
               ),
             ),

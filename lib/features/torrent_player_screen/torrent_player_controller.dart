@@ -37,7 +37,7 @@ class TorrentPlayerController extends ChangeNotifier {
   ChewieController? _chewieController;
 
   final Map<Object, List<Subtitle>> _subtitleCues = {};
-
+  List<Subtitle> _activeSubtitleCues = [];
   final Map<Object, SubtitleTrack> _subtitleTracks = {};
 
   bool _streamStarted = false;
@@ -170,12 +170,11 @@ class TorrentPlayerController extends ChangeNotifier {
 
         onSubtitleTrackChanged: (track) {
           if (track == null) {
-            _chewieController?.setSubtitle([]);
+            _activeSubtitleCues = [];
 
-            if (_chewieController != null) {
-              _chewieController!.showSubtitles = false;
-              _chewieController!.notifyListeners();
-            }
+            _chewieController?.setSubtitle([]);
+            _chewieController?.showSubtitles = false;
+            _chewieController?.notifyListeners();
 
             return;
           }
@@ -184,12 +183,13 @@ class TorrentPlayerController extends ChangeNotifier {
 
           if (cues == null) return;
 
-          _chewieController?.setSubtitle(cues);
+          _activeSubtitleCues = cues;
 
-          if (_chewieController != null) {
-            _chewieController!.showSubtitles = true;
-            _chewieController!.notifyListeners();
-          }
+          _chewieController?.setSubtitle(cues);
+          _chewieController?.showSubtitles = true;
+          _chewieController?.notifyListeners();
+
+
         },
         showSubtitles: false,
         subtitleStyle: const SubtitleStyle(
@@ -205,6 +205,50 @@ class TorrentPlayerController extends ChangeNotifier {
           ),
           decoration: BoxDecoration(
             color: Colors.black54,
+          ),
+        ),
+        overlay: IgnorePointer(
+          child: ListenableBuilder(
+            listenable: _videoController!,
+            builder: (context, child) {
+              final subtitle = getSubtitleAt(
+                _videoController!.value.position,
+              );
+
+              if (subtitle == null) {
+                return const SizedBox.shrink();
+              }
+
+              return Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: 25,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.75),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      subtitle.text,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       );
@@ -249,21 +293,8 @@ class TorrentPlayerController extends ChangeNotifier {
     _subtitleCues[id] = subtitles;
     _subtitleTracks[id] = track;
 
-    chewie.setSubtitleTracks(
-      _subtitleTracks.values.toList(),
-    );
-
-
-    chewie.setSubtitle(subtitles);
-
-
-    chewie.showSubtitles = true;
-
-
+    chewie.setSubtitleTracks(_subtitleTracks.values.toList());
     chewie.selectSubtitleTrack(track);
-
-    chewie.notifyListeners();
-
   }
 
   void turnOffSubtitleTrack() {
@@ -285,7 +316,15 @@ class TorrentPlayerController extends ChangeNotifier {
       _addMovieToHistory();
     }
   }
+  Subtitle? getSubtitleAt(Duration position) {
+    for (final subtitle in _activeSubtitleCues) {
+      if (position >= subtitle.start && position <= subtitle.end) {
+        return subtitle;
+      }
+    }
 
+    return null;
+  }
   Future<void> _addMovieToHistory() async {
     if (_historySaved || _historySaving) return;
 
