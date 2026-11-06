@@ -73,16 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscureText: isObscured,
                       hint: l10n.password,
                       prefixIcon: Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            isObscured = !isObscured;
-                          });
-                        },
-                        icon: Icon(
-                          isObscured ? Icons.visibility_off : Icons.visibility,
-                        ),
-                      ),
                     ),
                     SizedBox(height: 16),
                     Align(

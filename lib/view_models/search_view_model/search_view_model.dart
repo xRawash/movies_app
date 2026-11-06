@@ -32,7 +32,7 @@ class SearchViewModel extends ChangeNotifier{
       return;
     }
 
-    _debounce = Timer(const Duration(seconds: 1), () => loadMovieSearchResults(query));
+    _debounce = Timer(const Duration(milliseconds: 600), () => loadMovieSearchResults(query));
   }
 
   Future<void> loadMovieSearchResults(String searchQuery) async {

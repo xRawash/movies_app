@@ -11,7 +11,8 @@ class CustomTextField extends StatefulWidget {
     this.obscureText = false,
     this.validation,
     this.textInputType,
-    this.onChanged
+    this.onChanged,
+    this.focusNode
   });
 
   final TextEditingController controller;
@@ -22,6 +23,7 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String?)? validation;
   final TextInputType? textInputType;
   final ValueChanged<String>? onChanged;
+  final FocusNode? focusNode;
 
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
@@ -86,6 +88,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
           borderSide: BorderSide(color: Colors.red),
         ),
       ),
+      focusNode: widget.focusNode,
+
     );
   }
 }

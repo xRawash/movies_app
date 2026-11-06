@@ -24,7 +24,7 @@ class Validations {
   }
   static String? validatePassword(String? password){
     RegExp passwordExp =  RegExp(
-      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$',
+      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#/$&*~]).{8,}$',
     );
     if (password == null || password.trim().isEmpty) {
       return "Sorry, required password";

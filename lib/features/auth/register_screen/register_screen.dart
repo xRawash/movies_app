@@ -4,6 +4,7 @@ import 'package:movies_app/core/sources/assets_manager.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
 import 'package:movies_app/core/sources/routes_manager.dart';
 import 'package:movies_app/core/utilities/utilities.dart';
+import 'package:movies_app/core/validations/password_criteria_validations.dart';
 import 'package:movies_app/core/validations/validations.dart';
 import 'package:movies_app/core/widgets/custom_elevated_button.dart';
 import 'package:movies_app/core/widgets/custom_phone_field.dart';
@@ -33,6 +34,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool isArabic = false;
   bool isObscured = true;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late final FocusNode _passwordFocusNode;
+  final ValueNotifier<bool> _showPasswordCriteria = ValueNotifier<bool>(false);
+  final ValueNotifier<String> _passwordText = ValueNotifier<String>('');
 
   final List<String> avatarSeeds = AvatarSeeds.avatars;
   late String selectedAvatarSeed;
@@ -47,6 +51,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _passwordConfirmController = TextEditingController();
     _pageController = PageController(viewportFraction: 0.35, initialPage: 0);
     selectedAvatarSeed = avatarSeeds[0];
+    _passwordFocusNode = FocusNode();
+    _passwordFocusNode.addListener((){
+      _showPasswordCriteria.value = _passwordFocusNode.hasFocus;
+    });
   }
 
   @override
@@ -57,6 +65,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _phoneNumberController.dispose();
     _passwordConfirmController.dispose();
     _pageController.dispose();
+    _passwordFocusNode.dispose();
+    _showPasswordCriteria.dispose();
+    _passwordText.dispose();
     super.dispose();
   }
 
@@ -169,22 +180,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     prefixIcon: Icon(Icons.email),
                   ),
                   SizedBox(height: 23),
-                  CustomTextField(
-                    controller: _passwordController,
-                    validation: Validations.validatePassword,
-                    obscureText: isObscured,
-                    hint: l10n.password,
-                    prefixIcon: Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isObscured = !isObscured;
-                        });
-                      },
-                      icon: Icon(
-                        isObscured ? Icons.visibility_off : Icons.visibility,
-                      ),
-                    ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: _showPasswordCriteria,
+                    builder: (context, showCriteria, child) {
+                      return ValueListenableBuilder<String>(
+                        valueListenable: _passwordText,
+                        builder: (context, password, child) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              CustomTextField(
+                                controller: _passwordController,
+                                focusNode: _passwordFocusNode,
+                                validation: Validations.validatePassword,
+                                obscureText: isObscured,
+                                hint: l10n.password,
+                                prefixIcon: const Icon(Icons.lock),
+                                onChanged: (value) {
+                                  _passwordText.value = value;
+                                },
+                              ),
+
+                              if (showCriteria) ...[
+                                const SizedBox(height: 12),
+                                _buildPasswordCriteria(password),
+                              ],
+                            ],
+                          );
+                        },
+                      );
+                    },
                   ),
                   SizedBox(height: 16),
                   CustomTextField(
@@ -197,16 +222,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: isObscured,
                     hint: l10n.confirmPassword,
                     prefixIcon: Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isObscured = !isObscured;
-                        });
-                      },
-                      icon: Icon(
-                        isObscured ? Icons.visibility_off : Icons.visibility,
-                      ),
-                    ),
                   ),
                   SizedBox(height: 16),
                   CustomPhoneField(controller: _phoneNumberController),
@@ -316,6 +331,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
+    );
+  }
+  Widget _buildPasswordCriteria(String password) {
+    final criteria = {
+      'At least 8 characters':
+      PasswordCriteriaValidations.hasMinLength(password),
+      'One uppercase letter (A-Z)':
+      PasswordCriteriaValidations.hasUppercase(password),
+      'One lowercase letter (a-z)':
+      PasswordCriteriaValidations.hasLowercase(password),
+      'At least one number (0-9)':
+      PasswordCriteriaValidations.hasNumber(password),
+      'One special character (!@#\$&*~)':
+      PasswordCriteriaValidations.hasSpecialCharacter(password),
+    };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: criteria.entries.map((entry) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 3),
+          child: Row(
+            children: [
+              Icon(
+                entry.value
+                    ? Icons.check_circle
+                    : Icons.circle_outlined,
+                size: 17,
+                color: entry.value
+                    ? Colors.green
+                    : Colors.white54,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                entry.key,
+                style: TextStyle(
+                  color: entry.value
+                      ? Colors.green
+                      : Colors.white70,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }
