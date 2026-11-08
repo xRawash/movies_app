@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:movies_app/api/movie_detailed_response/movie.dart';
 import 'package:movies_app/api/subdl_api/subdl_api_service.dart';
 import 'package:movies_app/core/sources/colors_manager.dart';
-import 'package:movies_app/core/utilities/srt_parser.dart';
+import 'package:movies_app/features/torrent_player_screen/helpers/subtitle_helpers.dart';
 import 'package:movies_app/features/torrent_player_screen/torrent_player_controller.dart';
 import 'package:movies_app/features/torrent_player_screen/widgets/loading_view.dart';
-import 'package:movies_app/features/torrent_player_screen/widgets/subtitle_picker_sheet.dart';
 import 'package:movies_app/repos/subtitle_repo/subtitle_repo_impl.dart';
 import 'package:movies_app/view_models/subtitle_view_model/subtitle_view_model.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class TorrentPlayerScreen extends StatefulWidget {
   const TorrentPlayerScreen({
@@ -38,76 +38,31 @@ class _TorrentPlayerScreenState
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
+
+    _subtitleApiService = SubdlApiService();
+    _subtitleViewModel = SubtitleViewModel(
+      repository: SubtitleRepoImpl(apiService: _subtitleApiService),
+    );
 
     _controller = TorrentPlayerController(
       magnetLink: widget.magnetLink,
       torrentId: widget.torrentId,
       movie: widget.movie,
-      onSubtitlesPressed: _showSubtitlePicker
+      onSubtitlesPressed: () => SubtitleHelpers.showSubtitlePicker(
+        context: context,
+        subtitleViewModel: _subtitleViewModel,
+        movie: widget.movie,
+        torrentController: _controller,
+      ),
     )..start();
-    _subtitleApiService = SubdlApiService();
-
-    _subtitleViewModel = SubtitleViewModel(
-      repository: SubtitleRepoImpl(apiService: _subtitleApiService)
-    );
-  }
-
-
-  Future<void> _applySelectedSubtitle() async {
-    final path = _subtitleViewModel.selectedSubtitlePath;
-    final subtitle = _subtitleViewModel.selectedSubtitle;
-
-
-    if (path == null || subtitle == null) {
-      _controller.turnOffSubtitleTrack();
-      return;
-    }
-
-    try {
-      final cues = await SrtParser.parseFile(path);
-
-      if (!mounted) return;
-
-
-      _controller.addSubtitleTrack(
-        id: path,
-        label: subtitle.releaseName.isNotEmpty
-            ? subtitle.releaseName
-            : subtitle.name,
-        language: subtitle.language,
-        subtitles: cues,
-      );
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Could not load subtitles: $e'),
-        ),
-      );
-    }
-  }
-
-  void _showSubtitlePicker() {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: ColorsManager.black,
-      builder: (context) {
-        return SubtitlePickerSheet(
-          viewModel: _subtitleViewModel,
-          movie: widget.movie,
-          onSelected: _applySelectedSubtitle,
-        );
-      },
-    );
   }
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     _subtitleViewModel.dispose();
     _subtitleApiService.dispose();
-
     _controller.dispose();
 
     super.dispose();
