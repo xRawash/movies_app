@@ -14,6 +14,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   late PageController _pageController;
   List<OnboardingModel> onboardings = OnboardingModel.onboarding;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -29,81 +30,108 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PageView.builder(
-      itemCount: onboardings.length,
-      controller: _pageController,
-      itemBuilder: (context, index) {
-        bool isFirstPage = index == 0;
-        bool isLastPage = index == onboardings.length - 1;
-        return Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(onboardings[index].imageBath),
-              fit: BoxFit.cover,
-            ),
+    bool isFirstPage = _currentIndex == 0;
+    bool isLastPage = _currentIndex == onboardings.length - 1;
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            itemCount: onboardings.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return Image.asset(
+                onboardings[index].imageBath,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+              );
+            },
           ),
-          child: BottomSheet(
-            backgroundColor: index == 0
-                ? Colors.transparent
-                : ColorsManager.black,
-            onClosing: () {},
-            builder: (context) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 20,
+
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 20,
+              ),
+              decoration: BoxDecoration(
+                color: _currentIndex == 0
+                    ? Colors.transparent
+                    : ColorsManager.black,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 20,
-                  children: [
-                    Text(
-                      onboardings[index].label,
-                      style: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    onboardings[_currentIndex].label,
+                    style: Theme.of(context).textTheme.labelLarge,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    onboardings[_currentIndex].description,
+                    style: _currentIndex == 0
+                        ? Theme.of(context).textTheme.displayMedium
+                        : Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 20),
+                  CustomElevatedButton(
+                    title: Text(
+                      isFirstPage
+                          ? "Explore Now"
+                          : isLastPage
+                              ? "Finish"
+                              : "Next",
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    Text(
-                      onboardings[index].description,
-                      style: index == 0
-                          ? Theme.of(context).textTheme.displayMedium
-                          : Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    onPressed: () {
+                      if (isLastPage) {
+                        PrefsManager.finishedOnboarding();
+                        Navigator.pushReplacementNamed(context, '/register');
+                      } else {
+                        _pageController.nextPage(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    },
+                    backgroundColor: ColorsManager.yellow,
+                  ),
+                  if (_currentIndex > 1) ...[
+                    const SizedBox(height: 12),
                     CustomElevatedButton(
-                      title: Text(
-                        isFirstPage ? "Explore Now" : isLastPage ? "Finish" : "Next",
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      onPressed: () {
-                        if (isLastPage){
-                          PrefsManager.finishedOnboarding();
-                          Navigator.pushReplacementNamed(context, '/register');
-                        } else {
-                          _pageController.nextPage(duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
-                        }
-                      },
-                      backgroundColor: ColorsManager.yellow,
-                    ),
-                    index > 1
-                        ? CustomElevatedButton(
                       title: Text(
                         "Back",
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       onPressed: () {
-                        _pageController.previousPage(duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+                        _pageController.previousPage(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeInOut,
+                        );
                       },
                       backgroundColor: ColorsManager.black,
                       borderColor: ColorsManager.yellow,
-                    )
-                        : Container(),
+                    ),
                   ],
-                ),
-              );
-            },
+                ],
+              ),
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }
