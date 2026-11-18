@@ -10,7 +10,7 @@ class ProfileViewModel extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
-  UserModel currentUser = UserModel.loggedInUser!;
+  UserModel get currentUser => UserModel.loggedInUser ?? UserModel(name: '', id: '', email: '', phone: '');
   int selectedTab = 0;
 
   Future<bool> signOut() async {
@@ -49,11 +49,6 @@ class ProfileViewModel extends ChangeNotifier {
   }
 
   void updateCurrentUser() {
-    final user = UserModel.loggedInUser;
-
-    if (user == null) return;
-
-    currentUser = user;
     notifyListeners();
   }
 }
