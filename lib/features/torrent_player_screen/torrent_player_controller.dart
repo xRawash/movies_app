@@ -330,8 +330,7 @@ class TorrentPlayerController extends ChangeNotifier {
     final remainingTime =
         video.value.duration - video.value.position;
 
-    if (video.value.position > Duration.zero &&
-        remainingTime <= const Duration(seconds: 10)) {
+    if (video.value.position > Duration.zero) {
       _addMovieToHistory();
     }
   }
